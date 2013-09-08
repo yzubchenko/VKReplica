@@ -37,12 +37,12 @@ void Auth::calculateWebViewGeometry()
 /*Запуск процесса авторизации*/
 void Auth::exec() {
     qDebug() << "request auth";
-    requestAuth();
+    showAuthDialog();
     eventoLoop->exec();
 }
 
 /*Отображает окно логина*/
-void Auth::requestAuth() {
+void Auth::showAuthDialog() {
     QUrl *url = new QUrl("https://oauth.vk.com/authorize?client_id=3860301&scope=friends,audio,status,messages&redirect_uri=https://oauth.vk.com/blank.html&display=page&v=5.0&response_type=token");
     webView->load(*url);
     webView->show();
@@ -58,7 +58,7 @@ void Auth::handleReply(QNetworkReply *reply) {
             webView->hide();
             if (parsedReply->contains("error")) {
                 ErrorDialog *errorDialog = new ErrorDialog(parsedReply->take("error_description"));
-                errorDialog->connect(errorDialog, SIGNAL(finished(int)), this, SLOT(requestAuth()));
+                errorDialog->connect(errorDialog, SIGNAL(finished(int)), this, SLOT(showAuthDialog()));
                 errorDialog->show();
             } else {
                 token = parsedReply->take("access_token");

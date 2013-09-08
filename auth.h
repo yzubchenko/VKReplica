@@ -35,7 +35,7 @@ signals:
 
 public slots:
     void handleReply(QNetworkReply *reply);
-    void requestAuth();
+    void showAuthDialog();
 
 };
 
