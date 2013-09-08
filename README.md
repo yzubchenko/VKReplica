@@ -1,0 +1,4 @@
+VKReplica
+=========
+
+VKontakte lightweight messenger
