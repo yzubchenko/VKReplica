@@ -31,6 +31,7 @@ public:
 
     QRect * setWebViewGeometry();
     void calculateWebViewGeometry();
+    ~Auth();
 signals:
 
 public slots:

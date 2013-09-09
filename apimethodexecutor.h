@@ -14,6 +14,7 @@ class ApiMethodExecutor : public QObject
 public:
     explicit ApiMethodExecutor(QString token, QObject *parent = 0);
     QJsonObject executeMethod(QString methodName, QMap<QString,QString> params);
+    ~ApiMethodExecutor();
 
 private:
     CustomNetworkAccessManager *networkAccessManager;

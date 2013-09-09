@@ -37,3 +37,8 @@ QJsonObject ApiMethodExecutor::executeMethod(QString methodName, QMap<QString, Q
 
     return document.object();
 }
+
+ApiMethodExecutor::~ApiMethodExecutor() {
+    delete networkAccessManager;
+    token.clear();
+}

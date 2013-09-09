@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     connection/autosaver.cpp \
     errordialog.cpp \
     apimethodexecutor.cpp \
-    contacts.cpp
+    htmldelegate.cpp \
+    contactmodel.cpp
 
 HEADERS  += mainwindow.h \
     connection/customnetworkmanager.h \
@@ -34,7 +35,10 @@ HEADERS  += mainwindow.h \
     connection/cookiejar.h \
     errordialog.h \
     apimethodexecutor.h \
-    contacts.h
+    contactmodel.h \
+    htmldelegate.h
 
 FORMS    += mainwindow.ui \
     errordialog.ui
+
+RESOURCES +=

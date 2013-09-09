@@ -18,12 +18,17 @@ Application::Application(QObject *parent) :
 }
 
 void Application::exec() {
-    auth = new Auth();
+    auth = new Auth(this);
     auth->exec();
 
-    apiMethodExecutor = new ApiMethodExecutor(auth->getToken());
+    apiMethodExecutor = new ApiMethodExecutor(auth->getToken(),this);
 
     MainWindow *mainWindow = new MainWindow(this);
     mainWindow->show();
+}
+
+Application::~Application()
+{
+
 }
 

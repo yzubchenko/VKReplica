@@ -12,7 +12,7 @@
 
 /*Конструктор*/
 Auth::Auth(QObject *parent) : QObject(parent) {
-    eventoLoop = new QEventLoop();
+    eventoLoop = new QEventLoop(this);
 
     CustomNetworkAccessManager *networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone);
     networkAccessManager->connect(networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleReply(QNetworkReply*)));
@@ -33,6 +33,7 @@ void Auth::calculateWebViewGeometry()
     webView->setGeometry(*webViewRect);
     webView->setFixedSize(QSize(607,314));
 }
+
 
 /*Запуск процесса авторизации*/
 void Auth::exec() {
@@ -85,4 +86,10 @@ QMap<QString, QString>* Auth::parseReplyFragment(QString authFragment) {
     return replyMap;
 }
 
+Auth::~Auth() {
+    delete webView;
+    token.clear();
+    userId.clear();
+    expiresIn.clear();
+}
 

@@ -12,6 +12,7 @@ public:
     explicit Application(QObject *parent = 0);
     void exec();
     ApiMethodExecutor *getApiMethodExecutor() const {return apiMethodExecutor;}
+    ~Application();
 
 private:
     Auth *auth;
