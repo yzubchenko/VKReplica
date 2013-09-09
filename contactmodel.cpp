@@ -60,7 +60,7 @@ QVariant ContactModel::data(const QModelIndex &index, int role) const {
         Contact *contact = contactList->at(index.row());
         QString displayHtml;
         if (contact->unreadMessage) {
-            displayHtml = "<img src='"+QApplication::applicationDirPath()+"/resources/msg.png' height=8 />&nbsp;&nbsp;";
+            displayHtml = "<img src='"+QApplication::applicationDirPath()+"/resources/msg.png' />&nbsp;&nbsp;";
             if (contact->isOnline) {
 
                 displayHtml += "<b style='color:green; ";
