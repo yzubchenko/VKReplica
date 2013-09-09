@@ -25,6 +25,7 @@ void Application::exec() {
 
     MainWindow *mainWindow = new MainWindow(this);
     mainWindow->show();
+    mainWindow->applyContactModel(new ContactModel(this,this));
 }
 
 Application::~Application()

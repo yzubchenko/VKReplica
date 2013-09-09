@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "contactmodel.h"
+
 #include <QMainWindow>
 #include <application.h>
 
@@ -16,6 +18,7 @@ public:
     explicit MainWindow(Application *app, QWidget *parent = 0);
     ~MainWindow();
 
+    void applyContactModel(ContactModel *contactModel);
 private:
     Ui::MainWindow *ui;
     Application *application;

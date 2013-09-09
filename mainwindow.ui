@@ -36,14 +36,11 @@
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QListView" name="listView">
-          <property name="selectionBehavior">
-           <enum>QAbstractItemView::SelectRows</enum>
-          </property>
           <property name="resizeMode">
            <enum>QListView::Adjust</enum>
           </property>
-          <property name="modelColumn">
-           <number>0</number>
+          <property name="uniformItemSizes">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -82,7 +79,7 @@
      <x>0</x>
      <y>0</y>
      <width>260</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

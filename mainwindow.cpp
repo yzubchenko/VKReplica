@@ -20,14 +20,16 @@ MainWindow::MainWindow(Application *app, QWidget *parent) : QMainWindow(parent),
 //    QRect *mainWindowRect = new QRect((screenRect.width()-260), (screenRect.height()-400), 260, 400);
 //    this->setGeometry(*mainWindowRect); /**Windows 2 screen bug**/
 
-    ContactModel *contactModel = new ContactModel(this->application);
-    ui->listView->setModel(contactModel);
+
 
     HtmlDelegate* htmlDelegate = new HtmlDelegate();
     ui->listView->setItemDelegate(htmlDelegate);
-    contactModel->setHasUnreadMessage("",true);
-    ui->listView->repaint();
 
+}
+
+void MainWindow::applyContactModel(ContactModel *contactModel) {
+    ui->listView->setModel(contactModel);
+    //contactModel->acceptHasUnreadMessage("22389460",true);
 }
 
 MainWindow::~MainWindow() {
