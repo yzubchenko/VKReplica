@@ -11,6 +11,7 @@
 #include "apimethodexecutor.h"
 #include "longpollexecutor.h"
 #include "application.h"
+#include "dialog.h"
 
 #include <QJsonObject>
 
@@ -30,6 +31,9 @@ void Application::exec() {
     longPollExecutor = new LongPollExecutor(this,this);
     mainWindow->applyContactModel(new ContactModel(this,this));
     longPollExecutor->start();
+
+    Dialog* dialog = new Dialog();
+    dialog->show();
 }
 
 Application::~Application()
