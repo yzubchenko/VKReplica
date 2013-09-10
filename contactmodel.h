@@ -48,7 +48,8 @@ private:
 signals:
 
 public slots:
-    void acceptHasUnreadMessage(QString user_id, bool isRead);
+    void setContactOnline(QString userId, bool isOnline);
+    void acceptHasUnreadMessage(QString userId, bool hasUnread);
 };
 
 #endif // CONTACTS_H

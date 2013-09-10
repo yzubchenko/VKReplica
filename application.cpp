@@ -9,6 +9,8 @@
 #include <QMap>
 #include <QString>
 #include "apimethodexecutor.h"
+#include "longpollexecutor.h"
+#include "application.h"
 
 #include <QJsonObject>
 
@@ -25,7 +27,9 @@ void Application::exec() {
 
     MainWindow *mainWindow = new MainWindow(this);
     mainWindow->show();
+    longPollExecutor = new LongPollExecutor(this,this);
     mainWindow->applyContactModel(new ContactModel(this,this));
+    longPollExecutor->start();
 }
 
 Application::~Application()

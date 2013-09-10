@@ -5,6 +5,8 @@
 #include "auth.h"
 #include "apimethodexecutor.h"
 
+class LongPollExecutor;
+
 class Application : public QObject
 {
     Q_OBJECT
@@ -14,9 +16,12 @@ public:
     ApiMethodExecutor *getApiMethodExecutor() const {return apiMethodExecutor;}
     ~Application();
 
+    LongPollExecutor *getLongPollExecutor() const {return longPollExecutor;}
+
 private:
     Auth *auth;
     ApiMethodExecutor *apiMethodExecutor;
+    LongPollExecutor *longPollExecutor;
 signals:
 
 public slots:

@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     errordialog.cpp \
     apimethodexecutor.cpp \
     htmldelegate.cpp \
-    contactmodel.cpp
+    contactmodel.cpp \
+    longpollexecutor.cpp
 
 HEADERS  += mainwindow.h \
     connection/customnetworkmanager.h \
@@ -36,7 +37,8 @@ HEADERS  += mainwindow.h \
     errordialog.h \
     apimethodexecutor.h \
     contactmodel.h \
-    htmldelegate.h
+    htmldelegate.h \
+    longpollexecutor.h
 
 FORMS    += mainwindow.ui \
     errordialog.ui

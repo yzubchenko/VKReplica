@@ -1,5 +1,6 @@
 #include "contactmodel.h"
 #include <QApplication>
+#include "longpollexecutor.h"
 
 bool ascDisplayName(const Contact* c1 , const Contact* c2 ) {
     if (c1->isOnline && !c2->isOnline) {
@@ -65,7 +66,7 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
             break;
         }
     }
-
+    connect(application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
 
 }
 
@@ -182,7 +183,7 @@ void ContactModel::insert(Contact* contact, int idx) {
     emit dataChanged(index(0), index(contactList->size()-1));
 }
 
-void ContactModel::acceptHasUnreadMessage(QString userId, bool isRead) {
+void ContactModel::setContactOnline(QString userId, bool isOnline) {
     Contact* contact = findByUserId(userId);
     if (contact == NULL) {
 //        TODO Если контакт не найден, попробовать сделать запрос по API,
@@ -190,11 +191,22 @@ void ContactModel::acceptHasUnreadMessage(QString userId, bool isRead) {
         return;
     }
     contactList->removeAt(contactList->indexOf(contact));
-    if (isRead) {
-        contact->unreadMessage = true;
+    contact->isOnline = isOnline;
+    this->insert(contact);
+}
+
+void ContactModel::acceptHasUnreadMessage(QString userId, bool hasUnread) {
+    Contact* contact = findByUserId(userId);
+    if (contact == NULL) {
+//        TODO Если контакт не найден, попробовать сделать запрос по API,
+//        и только если там не найдется, выходить из метода
+        return;
+    }
+    contactList->removeAt(contactList->indexOf(contact));
+    contact->unreadMessage = hasUnread;
+    if (hasUnread) {
         this->insert(contact, 0);
     } else {
-        contact->unreadMessage = true;
         this->insert(contact);
     }
 }
