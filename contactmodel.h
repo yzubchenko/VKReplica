@@ -12,10 +12,9 @@ struct Contact {
     QString displayName;
     bool isOnline;
     bool unreadMessage;
-    bool needReconstructViewData;
-    QString viewData;
 };
 
+Q_DECLARE_METATYPE(Contact *)
 
 class ContactModel : public QAbstractListModel
 {

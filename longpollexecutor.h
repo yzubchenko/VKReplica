@@ -38,6 +38,7 @@ signals:
 62,$user_id,$chat_id -- пользователь $user_id начал набирать текст в беседе $chat_id.
 70,$user_id,$call_id -- пользователь $user_id совершил звонок имеющий идентификатор $call_id, дополнительную информацию о звонке можно получить используя метод voip.getCallInfo.*/
     void messageRemoved(QString messageId);
+    void messageRecieved(QString fromId, bool isUnread);
     void messageRecieved(QString messageId, int flags, QString fromId, QString timestamp, QString text);
     void contactIsOnline(QString userId, bool isOnline);
 public slots:

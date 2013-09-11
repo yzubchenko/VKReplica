@@ -9,7 +9,7 @@
 #include <QJsonValue>
 #include <QVariantList>
 #include <QVariantMap>
-#include "htmldelegate.h"
+#include "contactdelegate.h"
 #include <QList>
 
 
@@ -20,7 +20,7 @@ MainWindow::MainWindow(Application *app, QWidget *parent) : QMainWindow(parent),
 //    QRect *mainWindowRect = new QRect((screenRect.width()-260), (screenRect.height()-400), 260, 400);
 //    this->setGeometry(*mainWindowRect); /**Windows 2 screen bug**/
 
-    HtmlDelegate* htmlDelegate = new HtmlDelegate();
+    ContactDelegate* htmlDelegate = new ContactDelegate();
     ui->listView->setItemDelegate(htmlDelegate);
     this->connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)),this, SLOT(showDialog(QModelIndex)));
     dialogManager = new DialogManager(application,this);

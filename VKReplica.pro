@@ -24,11 +24,11 @@ SOURCES += main.cpp\
     connection/autosaver.cpp \
     errordialog.cpp \
     apimethodexecutor.cpp \
-    htmldelegate.cpp \
     contactmodel.cpp \
     longpollexecutor.cpp \
     dialogmanager.cpp \
-    dialog.cpp
+    dialog.cpp \
+    contactdelegate.cpp
 
 HEADERS  += mainwindow.h \
     connection/customnetworkmanager.h \
@@ -39,7 +39,7 @@ HEADERS  += mainwindow.h \
     errordialog.h \
     apimethodexecutor.h \
     contactmodel.h \
-    htmldelegate.h \
+    contactdelegate.h \
     longpollexecutor.h \
     dialogmanager.h \
     dialog.h
@@ -49,4 +49,5 @@ FORMS    += mainwindow.ui \
     dialogmanager.ui \
     dialog.ui
 
-RESOURCES +=
+RESOURCES += \
+    resources.qrc

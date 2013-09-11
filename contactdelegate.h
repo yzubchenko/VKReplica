@@ -2,7 +2,7 @@
 #define HTMLDELEGATE_H
 #include <QStyledItemDelegate>
 
-class HtmlDelegate : public QStyledItemDelegate
+class ContactDelegate : public QStyledItemDelegate
 {
   // Q_OBJECT
 protected:

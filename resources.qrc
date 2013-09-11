@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/contacts">
+        <file>resources/msg.png</file>
+        <file>resources/offline.png</file>
+        <file>resources/online.png</file>
+    </qresource>
+</RCC>

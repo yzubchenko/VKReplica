@@ -51,7 +51,7 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
                 .append(" ")
                 .append(valueMap.value("last_name").toString());
         bool isOnline = valueMap.value("online").toDouble();
-        Contact *contact = new Contact{userId,rating,displayName,isOnline,false,true,""};
+        Contact *contact = new Contact{userId,rating,displayName,isOnline,false};
         rating--;
         contactList->push_back(contact);
         orderList->push_back(contact->userId);
@@ -67,6 +67,7 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
         }
     }
     connect(application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
+    connect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptHasUnreadMessage(QString,bool)));
 
 }
 
@@ -83,32 +84,9 @@ QVariant ContactModel::data(const QModelIndex &index, int role) const {
     }
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
         Contact *contact = contactList->at(index.row());
-        if (contact->needReconstructViewData) {
-            QString viewData;
-            if (contact->unreadMessage) {
-                viewData = "<img src='"+QApplication::applicationDirPath()+"/resources/msg.png' />&nbsp;&nbsp;";
-                if (contact->isOnline) {
-
-                    viewData += "<b style='color:green; ";
-                } else {
-                    viewData += "<span style='color:gray; ";
-                }
-
-            } else {
-                if (contact->isOnline) {
-                    viewData = "<img src='"+QApplication::applicationDirPath()+"/resources/online.png' />&nbsp;&nbsp;<span style='color:darkgreen; ";
-                } else {
-                    viewData = "<img src='"+QApplication::applicationDirPath()+"/resources/offline.png' />&nbsp;&nbsp;<span style='color:gray; ";
-                }
-            }
-
-            viewData.append("'>"+contact->displayName+"</span>");
-
-            contact->viewData = viewData;
-            contact->needReconstructViewData = false;
-
-        }
-        return contact->viewData;
+        QVariant contactVariant;
+        contactVariant.setValue(contact);
+        return contactVariant;
     }
     return QVariant();
 }
@@ -194,7 +172,6 @@ void ContactModel::insert(Contact* contact, int idx) {
 
 void ContactModel::setContactOnline(QString userId, bool isOnline) {
     Contact* contact = findByUserId(userId);
-    contact->needReconstructViewData = true;
     if (contact == NULL) {
 //        TODO Если контакт не найден, попробовать сделать запрос по API,
 //        и только если там не найдется, выходить из метода
@@ -207,7 +184,6 @@ void ContactModel::setContactOnline(QString userId, bool isOnline) {
 
 void ContactModel::acceptHasUnreadMessage(QString userId, bool hasUnread) {
     Contact* contact = findByUserId(userId);
-    contact->needReconstructViewData = true;
     if (contact == NULL) {
 //        TODO Если контакт не найден, попробовать сделать запрос по API,
 //        и только если там не найдется, выходить из метода

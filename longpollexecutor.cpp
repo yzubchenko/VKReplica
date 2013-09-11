@@ -63,6 +63,9 @@ void LongPollExecutor::replyFinished(QNetworkReply *reply) {
                 }
                 //Новое сообщение
                 case 4: {
+                    QString userId = update.value(3).toString();
+                    emit messageRecieved(userId,true);
+                    //TODO Передача сигнала с расширенной информацией о сообщении
                     break;
                 }
                 //Контакт онлайн
