@@ -12,6 +12,8 @@ struct Contact {
     QString displayName;
     bool isOnline;
     bool unreadMessage;
+    bool needReconstructViewData;
+    QString viewData;
 };
 
 
@@ -35,6 +37,7 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
     QList<Contact*>* getAll() const;
+    Contact* getByRow(int row);
     Contact* findByUserId(QString userId);
 
 

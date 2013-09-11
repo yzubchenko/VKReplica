@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "contactmodel.h"
+#include "dialogmanager.h"
 
 #include <QMainWindow>
 #include <application.h>
@@ -19,9 +20,13 @@ public:
     ~MainWindow();
 
     void applyContactModel(ContactModel *contactModel);
+public slots:
+    void showDialog(QModelIndex modelIndex);
 private:
     Ui::MainWindow *ui;
     Application *application;
+    ContactModel *contactModel;
+    DialogManager *dialogManager;
 };
 
 #endif // MAINWINDOW_H

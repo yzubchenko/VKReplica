@@ -27,6 +27,7 @@ SOURCES += main.cpp\
     htmldelegate.cpp \
     contactmodel.cpp \
     longpollexecutor.cpp \
+    dialogmanager.cpp \
     dialog.cpp
 
 HEADERS  += mainwindow.h \
@@ -40,10 +41,12 @@ HEADERS  += mainwindow.h \
     contactmodel.h \
     htmldelegate.h \
     longpollexecutor.h \
+    dialogmanager.h \
     dialog.h
 
 FORMS    += mainwindow.ui \
     errordialog.ui \
+    dialogmanager.ui \
     dialog.ui
 
 RESOURCES +=
