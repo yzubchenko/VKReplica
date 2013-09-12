@@ -13,7 +13,7 @@ void ContactDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     painter->save();
     Contact* contact = qvariant_cast<Contact*>(index.data());
     QIcon* statusIcon;
-    if (contact->unreadMessage) {
+    if (contact->hasUnreadMessage) {
         statusIcon = new QIcon(":/contacts/resources/msg.png");
     } else {
         if (contact->isOnline) {
@@ -39,14 +39,15 @@ void ContactDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
 
 
     QSize statusIconsize = statusIcon->actualSize(option.decorationSize);
-    statusIconRect.setRight(statusIconsize.width()+16);
-    statusIconRect.setTop(statusIconRect.top()+1);
-    displayNameRect.setLeft(statusIconRect.right());
-    displayNameRect.setTop(displayNameRect.top()+5);
+    statusIconRect.setLeft(option.rect.left()+4);
+    statusIconRect.setRight(statusIconRect.left()+16);
+    statusIconRect.setTop(option.rect.top()+(option.rect.height() - 16)/2);
+
+    displayNameRect.setLeft(statusIconRect.right()+6);
+    displayNameRect.setTop(displayNameRect.top()+(option.rect.height() -fm.height())/2);
     displayNameRect.setBottom(displayNameRect.top()+fm.height());
 
-    painter->drawPixmap(QPoint(statusIconRect.left()+statusIconsize.width()/2+2
-                            ,statusIconRect.top()+statusIconsize.height()/2+3)
+    painter->drawPixmap(QPoint(statusIconRect.left(),statusIconRect.top())
                         ,statusIcon->pixmap(statusIconsize.width(),statusIconsize.height()));
 
     painter->setFont(font);

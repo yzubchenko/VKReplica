@@ -15,10 +15,9 @@ DialogManager::~DialogManager() {
 
 void DialogManager::showDialog(Contact* contact) {
     if (!dialogMap->contains(contact->displayName)) {
-        Dialog* dialog= new Dialog(this);
+        Dialog* dialog= new Dialog(application, contact->userId, this);
         dialogMap->insert(contact->displayName,dialog);
         this->ui->tabWidget->addTab(dialog,contact->displayName);
-        //TODO Добавить загрузку последних N сообщений
     }
     Dialog* dialog = dialogMap->value(contact->displayName);
     this->show();

@@ -2,16 +2,17 @@
 #define CONTACTS_H
 
 #include <QObject>
-#include "application.h"
 #include <QList>
 #include <QAbstractListModel>
+
+class Application;
 
 struct Contact {
     QString userId;
     int rating;
     QString displayName;
     bool isOnline;
-    bool unreadMessage;
+    bool hasUnreadMessage;
 };
 
 Q_DECLARE_METATYPE(Contact *)
@@ -40,6 +41,8 @@ public:
     Contact* findByUserId(QString userId);
 
 
+    void push(Contact* contact);
+    void refreshContact(Contact* contact);
 private:
     Application* application;
     QList<Contact*>* contactList;
@@ -51,7 +54,7 @@ signals:
 
 public slots:
     void setContactOnline(QString userId, bool isOnline);
-    void acceptHasUnreadMessage(QString userId, bool hasUnread);
+    void acceptUnreadMessage(QString userId, bool hasUnread);
 };
 
 #endif // CONTACTS_H

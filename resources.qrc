@@ -4,4 +4,7 @@
         <file>resources/offline.png</file>
         <file>resources/online.png</file>
     </qresource>
+    <qresource prefix="/dialog">
+        <file>resources/sendButton.png</file>
+    </qresource>
 </RCC>
