@@ -36,6 +36,7 @@ public:
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
+
     QList<Contact*>* getAll() const;
     Contact* getByRow(int row);
     Contact* findByUserId(QString userId);
@@ -50,6 +51,7 @@ private:
     SortOrder sortOrder = DescRating;
 
     void insert(Contact *contact, int index = -1);
+    void checkUnreadMessages();
 signals:
 
 public slots:

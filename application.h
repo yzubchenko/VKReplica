@@ -22,6 +22,7 @@ public:
     QString getUserDisplayName() const {return userDisplayName;}
     QString getUserId() const {return userId;}
 
+
 private:
     Auth *auth;
     ApiMethodExecutor *apiMethodExecutor;
@@ -31,6 +32,7 @@ private:
     QString userId;
 
     void applyUser();
+
 signals:
 
 public slots:

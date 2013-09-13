@@ -68,6 +68,9 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
         contactList->push_back(contact);
         orderList->push_back(contact->userId);
     }
+
+    checkUnreadMessages();
+
     switch (sortOrder) {
         case DescRating: {
             qSort(contactList->begin(),contactList->end(),descRating);
@@ -80,7 +83,19 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
     }
     connect(application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
     connect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
+}
 
+void ContactModel::checkUnreadMessages() {
+    QMap<QString,QString> params;
+    params.insert("filters","1");
+    QJsonObject result = application->getApiMethodExecutor()->executeMethod("messages.get",params);
+    QVariantList responseList = result.toVariantMap().value("response").toList();
+    //Начинаем с 1, потому что 0 элемент - количество сообщений
+    for (int idx=1;idx<responseList.size();idx++) {
+        QMap<QString,QVariant> message = responseList.at(idx).toMap();
+        QString userId = message.value("uid").toString();
+        findByUserId(userId)->hasUnreadMessage = true;
+    }
 }
 
 int ContactModel::rowCount(const QModelIndex &parent) const {
@@ -193,10 +208,10 @@ void ContactModel::insert(Contact* contact, int idx) {
     emit dataChanged(index(0), index(contactList->size()-1));
 }
 
-void ContactModel::refreshContact(Contact* contact)
-{
+void ContactModel::refreshContact(Contact* contact) {
     contactList->removeAt(contactList->indexOf(contact));
     this->push(contact);
+    emit dataChanged(index(0), index(contactList->size()-1));
 }
 
 void ContactModel::setContactOnline(QString userId, bool isOnline) {
@@ -204,8 +219,10 @@ void ContactModel::setContactOnline(QString userId, bool isOnline) {
     if (contact == NULL) {
         return;
     }
-    contact->isOnline = isOnline;
-    refreshContact(contact);
+    if (contact->isOnline != isOnline) {
+        contact->isOnline = isOnline;
+        refreshContact(contact);
+    }
 }
 
 void ContactModel::acceptUnreadMessage(QString userId, bool hasUnread) {
@@ -213,7 +230,9 @@ void ContactModel::acceptUnreadMessage(QString userId, bool hasUnread) {
     if (contact == NULL) {
         return;
     }
-    contact->hasUnreadMessage = hasUnread;
-    refreshContact(contact);
+    if (contact->hasUnreadMessage != hasUnread) {
+        contact->hasUnreadMessage = hasUnread;
+        refreshContact(contact);
+    }
 }
 

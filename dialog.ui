@@ -54,7 +54,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QTextEdit" name="textEdit">
+     <widget class="FocusTextEdit" name="textEdit">
       <property name="frameShape">
        <enum>QFrame::WinPanel</enum>
       </property>
@@ -150,6 +150,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FocusTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>focustextedit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>textEdit</tabstop>
   <tabstop>pushButton</tabstop>

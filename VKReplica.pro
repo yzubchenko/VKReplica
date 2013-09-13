@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     longpollexecutor.cpp \
     dialogmanager.cpp \
     dialog.cpp \
-    contactdelegate.cpp
+    contactdelegate.cpp \
+    focustextedit.cpp
 
 HEADERS  += mainwindow.h \
     connection/customnetworkmanager.h \
@@ -42,7 +43,8 @@ HEADERS  += mainwindow.h \
     contactdelegate.h \
     longpollexecutor.h \
     dialogmanager.h \
-    dialog.h
+    dialog.h \
+    focustextedit.h
 
 FORMS    += mainwindow.ui \
     errordialog.ui \

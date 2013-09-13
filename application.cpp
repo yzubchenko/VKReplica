@@ -16,39 +16,39 @@
 
 #include <QJsonObject>
 
-Application::Application(QObject *parent) :
-    QObject(parent)
-{
+Application::Application(QObject *parent) : QObject(parent) {
 }
-
 
 
 void Application::exec() {
     auth = new Auth(this);
     auth->exec();
 
+    apiMethodExecutor = new ApiMethodExecutor(auth->getToken(),this);
+
     applyUser();
 
     MainWindow *mainWindow = new MainWindow(this);
     mainWindow->show();
+
     longPollExecutor = new LongPollExecutor(this,this);
     contactModel = new ContactModel(this,this);
     mainWindow->applyContactModel(contactModel);
+
     longPollExecutor->start();
 }
 
 void Application::applyUser() {
     QMap<QString,QString> params;
     params.insert("user_ids",auth->getUserId());
-    apiMethodExecutor = new ApiMethodExecutor(auth->getToken(),this);
+
     QJsonObject userJson = apiMethodExecutor->executeMethod("users.get",params);
     QVariantMap user = userJson.value("response").toVariant().toList().value(0).toMap();
     this->userDisplayName = user.value("first_name").toString() + " " + user.value("last_name").toString();
     this->userId = auth->getUserId();
 }
 
-Application::~Application()
-{
+Application::~Application() {
 
 }
 

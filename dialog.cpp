@@ -49,6 +49,7 @@ Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWid
                                     + body
                                     + "</td></tr></table>");
         }
+        connect(ui->textEdit, SIGNAL(focusIn()), this, SLOT(onFocusTextEdit()));
     }
 }
 
@@ -61,6 +62,10 @@ void Dialog::configSplitter()
 
 Dialog::~Dialog() {
     delete ui;
+}
+
+void Dialog::onFocusTextEdit() {
+    application->getContactModel()->acceptUnreadMessage(userId,false);
 }
 
 

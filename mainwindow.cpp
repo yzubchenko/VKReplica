@@ -29,8 +29,6 @@ MainWindow::MainWindow(Application *app, QWidget *parent) : QMainWindow(parent),
 void MainWindow::applyContactModel(ContactModel *contactModel) {
     this->contactModel = contactModel;
     ui->listView->setModel(this->contactModel);
-
-   contactModel->acceptUnreadMessage(contactModel->getByRow(3)->userId,true);
 }
 
 void MainWindow::showDialog(QModelIndex modelIndex) {

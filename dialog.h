@@ -17,12 +17,15 @@ public:
     explicit Dialog(Application *application, QString userId, QWidget *parent = 0);
     ~Dialog();
 
+public slots:
+    void onFocusTextEdit();
 private:
     Ui::Dialog *ui;
     Application *application;
     QString userId;
 
     void configSplitter();
+
 };
 
 #endif // DIALOG_H
