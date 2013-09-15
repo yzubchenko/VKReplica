@@ -13,6 +13,7 @@
 #include "longpollexecutor.h"
 #include "application.h"
 #include "dialog.h"
+#include "contactmodel.h"
 
 #include <QJsonObject>
 
@@ -32,8 +33,10 @@ void Application::exec() {
     mainWindow->show();
 
     longPollExecutor = new LongPollExecutor(this,this);
-    contactModel = new ContactModel(this,this);
+    ContactModel* contactModel = new ContactModel(this,this);
     mainWindow->applyContactModel(contactModel);
+    
+    dialogManager = new DialogManager(application,this);
 
     longPollExecutor->start();
 }

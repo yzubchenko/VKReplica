@@ -1,5 +1,6 @@
 
 #include "dialogmanager.h"
+#include "dialogmodel.h"
 #include "ui_dialogmanager.h"
 
 DialogManager::DialogManager(Application *application, QWidget *parent) : QDialog(parent), ui(new Ui::DialogManager) {
@@ -16,6 +17,8 @@ DialogManager::~DialogManager() {
 void DialogManager::showDialog(Contact* contact) {
     if (!dialogMap->contains(contact->displayName)) {
         Dialog* dialog= new Dialog(application, contact->userId, this);
+        DialogModel *dialogModel = new DialogModel(application, contact->userId, this);
+        dialog->applyDialogModel(dialogModel);
         dialogMap->insert(contact->displayName,dialog);
         this->ui->tabWidget->addTab(dialog,contact->displayName);
     }

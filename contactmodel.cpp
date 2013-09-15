@@ -49,7 +49,6 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
 
     //Заполнение списка контактов и списка порядка
     this->contactList = new QList<Contact*>();
-    this->orderList = new QList<QString>();
     int rating = contactJsonList.size();
     foreach (QVariant value,contactJsonList) {
         QMap<QString, QVariant> valueMap = value.toMap();
@@ -66,7 +65,6 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
         Contact *contact = new Contact{userId,rating,displayName,isOnline,false};
         rating--;
         contactList->push_back(contact);
-        orderList->push_back(contact->userId);
     }
 
     checkUnreadMessages();
@@ -142,10 +140,6 @@ bool ContactModel::removeRows(int row, int count, const QModelIndex &parent) {
     }
     endRemoveRows();
     return true;
-}
-
-QList<Contact*>* ContactModel::getAll() const {
-    return contactList;
 }
 
 Contact *ContactModel::getByRow(int row) {

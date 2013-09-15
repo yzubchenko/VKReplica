@@ -4,8 +4,7 @@
 #include <QObject>
 #include <QList>
 #include <QAbstractListModel>
-
-class Application;
+#include "application.h"
 
 struct Contact {
     QString userId;
@@ -37,7 +36,6 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
 
-    QList<Contact*>* getAll() const;
     Contact* getByRow(int row);
     Contact* findByUserId(QString userId);
 
@@ -47,7 +45,6 @@ public:
 private:
     Application* application;
     QList<Contact*>* contactList;
-    QList<QString>* orderList;
     SortOrder sortOrder = DescRating;
 
     void insert(Contact *contact, int index = -1);
