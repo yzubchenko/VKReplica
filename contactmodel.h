@@ -4,7 +4,9 @@
 #include <QObject>
 #include <QList>
 #include <QAbstractListModel>
-#include "application.h"
+
+
+class Application;
 
 struct Contact {
     QString userId;

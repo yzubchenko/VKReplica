@@ -2,9 +2,11 @@
 #define DIALOGMANAGER_H
 
 #include "dialog.h"
-#include "application.h"
+
 #include "contactmodel.h"
 #include <QDialog>
+
+class Application;
 
 namespace Ui {
 class DialogManager;

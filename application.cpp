@@ -14,7 +14,7 @@
 #include "application.h"
 #include "dialog.h"
 #include "contactmodel.h"
-
+#include "dialogmanager.h"
 #include <QJsonObject>
 
 Application::Application(QObject *parent) : QObject(parent) {
@@ -33,10 +33,10 @@ void Application::exec() {
     mainWindow->show();
 
     longPollExecutor = new LongPollExecutor(this,this);
-    ContactModel* contactModel = new ContactModel(this,this);
+    contactModel = new ContactModel(this,this);
     mainWindow->applyContactModel(contactModel);
     
-    dialogManager = new DialogManager(application,this);
+    dialogManager = new DialogManager(this,mainWindow);
 
     longPollExecutor->start();
 }

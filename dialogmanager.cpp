@@ -1,4 +1,4 @@
-
+#include "application.h"
 #include "dialogmanager.h"
 #include "dialogmodel.h"
 #include "ui_dialogmanager.h"

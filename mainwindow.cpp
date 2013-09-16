@@ -10,6 +10,7 @@
 #include <QVariantList>
 #include <QVariantMap>
 #include "contactdelegate.h"
+#include "dialogmanager.h"
 #include <QList>
 
 
@@ -39,6 +40,5 @@ void MainWindow::showDialog(QModelIndex modelIndex) {
 MainWindow::~MainWindow() {
     delete ui;
     application = NULL;
-    dialogManager = NULL;
     contactModel = NULL;
 }

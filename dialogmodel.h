@@ -1,9 +1,11 @@
 #ifndef DIALOGMODEL_H
 #define DIALOGMODEL_H
 
-#include "application.h"
 
 #include <QObject>
+#include <QList>
+#include <QAbstractListModel>
+#include "application.h"
 
 struct Message {
     QString id;
@@ -12,6 +14,8 @@ struct Message {
     QString body;
     bool isRead;
 };
+
+Q_DECLARE_METATYPE(Message *)
 
 class DialogModel : public QAbstractListModel {
     Q_OBJECT

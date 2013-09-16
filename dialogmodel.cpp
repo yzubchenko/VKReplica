@@ -1,6 +1,7 @@
 #include "dialogmodel.h"
+#include "contactmodel.h"
 
-DialogModel::DialogModel(Application *application, QString userId, QObject *parent) : QObject(parent) {
+DialogModel::DialogModel(Application *application, QString userId, QObject *parent) : QAbstractListModel(parent) {
     this->application = application;
     this->userId = userId;
     this->messageList = new QList<Message*>();
@@ -48,7 +49,7 @@ int DialogModel::rowCount(const QModelIndex &parent) const {
 }
 
 QVariant DialogModel::data(const QModelIndex &index, int role) const {
-    if (index.row() < 0 || index.row() >= contactList->size()) {
+    if (index.row() < 0 || index.row() >= messageList->size()) {
         return QVariant();
     }
     if (role == Qt::DisplayRole || role == Qt::EditRole) {

@@ -2,6 +2,7 @@
 #define DIALOG_H
 
 #include "application.h"
+#include "dialogmodel.h"
 
 #include <QWidget>
 
@@ -15,7 +16,7 @@ class Dialog : public QWidget
 
 public:
     explicit Dialog(Application *application, QString userId, QWidget *parent = 0);
-    applyDialogModel(DialogModel *dialogModel);
+    void applyDialogModel(DialogModel *dialogModel);
     ~Dialog();
 
 public slots:
@@ -24,6 +25,7 @@ private:
     Ui::Dialog *ui;
     Application *application;
     QString userId;
+    DialogModel *dialogModel;
 
     void configSplitter();
 

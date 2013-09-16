@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     dialog.cpp \
     contactdelegate.cpp \
     focustextedit.cpp \
-    dialogmodel.cpp
+    dialogmodel.cpp \
+    messagedelegate.cpp
 
 HEADERS  += mainwindow.h \
     connection/customnetworkmanager.h \
@@ -46,7 +47,8 @@ HEADERS  += mainwindow.h \
     dialogmanager.h \
     dialog.h \
     focustextedit.h \
-    dialogmodel.h
+    dialogmodel.h \
+    messagedelegate.h
 
 FORMS    += mainwindow.ui \
     errordialog.ui \

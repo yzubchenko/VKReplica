@@ -4,10 +4,11 @@
 #include <QObject>
 #include "auth.h"
 #include "apimethodexecutor.h"
-#include "dialogmanager.h"
 
 
+class DialogManager;
 class LongPollExecutor;
+class ContactModel;
 
 class Application : public QObject
 {
@@ -19,8 +20,9 @@ public:
     ~Application();
 
     LongPollExecutor *getLongPollExecutor() const {return longPollExecutor;}
-    DialogManager getUserId() const {return dialogManager;}
+    DialogManager* getDialogManager() const {return dialogManager;}
     QString getUserDisplayName() const {return userDisplayName;}
+    ContactModel* getContactModel() const {return contactModel;}
     QString getUserId() const {return userId;}
 
 
@@ -31,6 +33,7 @@ private:
     QString userDisplayName;
     QString userId;
     DialogManager * dialogManager;
+    ContactModel * contactModel;
 
     void applyUser();
 

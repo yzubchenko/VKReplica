@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QJsonObject>
 #include "longpollexecutor.h"
+#include "application.h"
 
 bool ascDisplayName(const Contact* c1 , const Contact* c2 ) {
     if (c1->hasUnreadMessage && !c2->hasUnreadMessage) {
