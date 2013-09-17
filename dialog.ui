@@ -28,12 +28,21 @@
      <property name="childrenCollapsible">
       <bool>false</bool>
      </property>
-     <widget class="QListView" name="listView">
+     <widget class="DialogListView" name="listView">
       <property name="frameShape">
        <enum>QFrame::WinPanel</enum>
       </property>
       <property name="frameShadow">
        <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="verticalScrollMode">
+       <enum>QAbstractItemView::ScrollPerPixel</enum>
+      </property>
+      <property name="horizontalScrollMode">
+       <enum>QAbstractItemView::ScrollPerPixel</enum>
       </property>
      </widget>
      <widget class="FocusTextEdit" name="textEdit">
@@ -143,6 +152,11 @@
    <class>FocusTextEdit</class>
    <extends>QTextEdit</extends>
    <header>focustextedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DialogListView</class>
+   <extends>QListView</extends>
+   <header>dialoglistview.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

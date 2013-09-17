@@ -16,7 +16,7 @@ protected:
     QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
 private:
-    QBrush acquireBackgroundBrush(Message* message) const;
+    QColor acquireBackgroundColor(Message* message) const;
 signals:
 
 public slots:

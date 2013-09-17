@@ -8,20 +8,18 @@
 #include <QApplication>
 #include <QPainter>
 #include <QLabel>
+#include <qabstractitemview.h>
 
 
-QBrush MessageDelegate::acquireBackgroundBrush(Message* message) const
+QColor MessageDelegate::acquireBackgroundColor(Message* message) const
 {
-    QBrush backgroundBrush;
-    QColor color;
+    QColor backgroundColor;
     if (message->isRead) {
-        color.setRgb(255,255,255);
+        backgroundColor.setRgb(255,255,255);
     } else {
-        color.setRgb(225,231,237);
+        backgroundColor.setRgb(225,231,237);
     }
-    backgroundBrush.setColor(color);
-
-    return backgroundBrush;
+    return backgroundColor;
 }
 
 void MessageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -29,11 +27,11 @@ void MessageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     QStyleOptionViewItemV4 optionV4 = option;
     initStyleOption(&optionV4, index);
 
-    QStyledItemDelegate::paint(painter,optionV4,index);
+    //QStyledItemDelegate::paint(painter,optionV4,index);
     painter->save();
     Message* message = qvariant_cast<Message*>(index.data());
 
-    QBrush backgroundBrush = acquireBackgroundBrush(message);
+    QBrush backgroundColor = acquireBackgroundColor(message);
 
     QString fromDisplayName = message->fromDisplayName;
     QColor fromDisplayNameColor;
@@ -48,69 +46,72 @@ void MessageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     bodyColor.setRgb(0,0,0);
 
     QFont font = QApplication::font();
-    QFontMetrics fm(font);
     font.setBold(true);
 
+    QFontMetrics fm(font);
 
-
-    QRect fromDisplayNameRect = optionV4.rect;
-    QRect dateRect = optionV4.rect;
-    QRect bodyRect = optionV4.rect;
-
-    bodyRect.setTop(dateRect.top() + fm.height() + 4);
+    QRect *fromDisplayNameRect = new QRect(optionV4.rect.left()+4,optionV4.rect.top()+4,(optionV4.rect.width()/2)-4,fm.height());
+    QRect *dateRect = new QRect(fromDisplayNameRect->right(),optionV4.rect.top()+4,optionV4.rect.width()/2-8,fm.height());
+    QRect *bodyRect = new QRect(optionV4.rect.left()+4,fromDisplayNameRect->bottom()+4,optionV4.rect.width()-4,optionV4.rect.height()-fm.height());
 
     painter->setFont(font);
-    painter->setBackground(backgroundBrush);
+
+    painter->fillRect(optionV4.rect, backgroundColor);
 
     font.setBold(true);
     painter->setFont(font);
     painter->setPen(fromDisplayNameColor);
-    painter->drawText(fromDisplayNameRect, Qt::AlignLeft, fromDisplayName);
+    painter->drawText(*fromDisplayNameRect, Qt::AlignLeft, fromDisplayName);
 
     font.setBold(false);
     painter->setFont(font);
     painter->setPen(dateColor);
-    painter->drawText(dateRect, Qt::AlignRight, date);
+    painter->drawText(*dateRect, Qt::AlignRight, date);
 
     painter->setPen(bodyColor);
-    painter->drawText(bodyRect, body);
+    painter->drawText(*bodyRect,Qt::AlignLeft|Qt::TextWordWrap, body);
 
     painter->restore();
 }
 
 QSize MessageDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    QFont font = QApplication::font();
-    QFontMetrics fm(font);
-
+//    QFont font = QApplication::font();
+//    QFontMetrics fm(font);
 
     Message* message = qvariant_cast<Message*>(index.data());
 
-//    int bodyHeight;
-//    if (message->body.length() > 0) {
-//        int bw = fm.width(message->body);
-//        QRect r =option.rect;
-//        int rw = r.width();
-//        bodyHeight = fm.width(message->body) / option.rect.width();
-//    } else {
-//        bodyHeight = fm.height();
-//    }
-
-    //QStyleOptionViewItemV4 optionV4 = option;
-    //initStyleOption(&optionV4, index);
-
-    QTextDocument doc;
-    doc.setDefaultFont(font);
-    doc.setHtml(message->body);
-    doc.setTextWidth(option.rect.width());
-
     QAbstractItemView *view = dynamic_cast<QAbstractItemView*>(parent());
     QFontMetrics fontMetrics = view->fontMetrics();
-    QRect rect = fontMetrics.boundingRect(index.data().toString());
-    int proportion = (rect.width() / (view->width() + 4));
-    if (proportion == 0 || rect.width() > view->width())
-        proportion++;
+    QRect messageRect = fontMetrics.boundingRect(message->body);
+    int viewWidth = view->viewport()->width();
+    int lineCount = (messageRect.width() / viewWidth);
+    if (lineCount == 0 || messageRect.width()>viewWidth) {
+        lineCount++;
+    }
+    return QSize(viewWidth, messageRect.height() * lineCount + fontMetrics.height()+12);
 
-    return QSize(view->width() - 4, rect.height() * proportion);
+//    QAbstractItemView *view = dynamic_cast<QAbstractItemView*>(parent());
+//       QFontMetricsF fontMetrics(view->fontMetrics());
+//       QString str = message->body.trimmed();
+//       QStringList words = str.split(QChar(' '));
+//       QRectF boundingRect = fontMetrics.boundingRect(str);
+//       int width = view->viewport()->width() - 6;
+//       int times = 0;
+//       while (words.size() > 0) {
+//           times++;
+//           qreal lineWidth = 0;
+//           bool enoughSpace = true;
+//           do {
+//               QString word = words.first();
+//               qreal wordWidth = fontMetrics.width(word);
+//               if (wordWidth + lineWidth < width) {
+//                   lineWidth += wordWidth;
+//                   lineWidth += fontMetrics.width(QChar(' '));
+//                   words.removeFirst();
+//               } else
+//                   enoughSpace = false;
 
-    return QSize(doc.idealWidth(), doc.size().height()+fm.height()+4);
+//           } while (enoughSpace && words.size() > 0);
+//       }
+//       return QSize(width, boundingRect.height() * times - times + 1);
 }

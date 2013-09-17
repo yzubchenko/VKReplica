@@ -14,6 +14,8 @@ Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWid
     MessageDelegate* messageDelegate = new MessageDelegate();
     ui->listView->setItemDelegate(messageDelegate);
     ui->listView->setResizeMode(QListView::Adjust);
+    messageDelegate->setParent(ui->listView);
+
 }
 
 void Dialog::applyDialogModel(DialogModel *dialogModel) {
