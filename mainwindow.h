@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "contactmodel.h"
+#include "dialogmanager.h"
 
 #include <QMainWindow>
 #include <application.h>
@@ -25,6 +26,7 @@ private:
     Ui::MainWindow *ui;
     Application *application;
     ContactModel *contactModel;
+    DialogManager *dialogManager;
 };
 
 #endif // MAINWINDOW_H

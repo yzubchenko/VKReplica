@@ -10,10 +10,9 @@ Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWid
     this->userId = userId;
     ui->setupUi(this);
     configSplitter();
-    
-    
     QMap<QString,QString> params;
     params.insert("count", "20");
+    //params.insert("rev","1");
     params.insert("user_id",userId);
 
     QJsonObject historyJson = application->getApiMethodExecutor()->executeMethod("messages.getHistory",params);

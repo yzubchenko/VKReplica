@@ -15,7 +15,6 @@ class Dialog : public QWidget
 
 public:
     explicit Dialog(Application *application, QString userId, QWidget *parent = 0);
-    applyDialogModel(DialogModel *dialogModel);
     ~Dialog();
 
 public slots:

@@ -22,8 +22,8 @@ MainWindow::MainWindow(Application *app, QWidget *parent) : QMainWindow(parent),
 
     ContactDelegate* htmlDelegate = new ContactDelegate();
     ui->listView->setItemDelegate(htmlDelegate);
-    connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)),this, SLOT(showDialog(QModelIndex)));
-   
+    this->connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)),this, SLOT(showDialog(QModelIndex)));
+    dialogManager = new DialogManager(application,this);
 }
 
 void MainWindow::applyContactModel(ContactModel *contactModel) {
@@ -33,7 +33,7 @@ void MainWindow::applyContactModel(ContactModel *contactModel) {
 
 void MainWindow::showDialog(QModelIndex modelIndex) {
     Contact *contact = contactModel->getByRow(modelIndex.row());
-    application->getDialogManager()->showDialog(contact);
+    dialogManager->showDialog(contact);
 }
 
 MainWindow::~MainWindow() {
