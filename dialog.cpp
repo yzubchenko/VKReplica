@@ -11,13 +11,14 @@ Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWid
     ui->setupUi(this);
     configSplitter();
     QMap<QString,QString> params;
-    params.insert("count", "20");
+    params.insert("count", "200");
     //params.insert("rev","1");
     params.insert("user_id",userId);
 
     QJsonObject historyJson = application->getApiMethodExecutor()->executeMethod("messages.getHistory",params);
     QVariantList messageList = historyJson.toVariantMap().value("response").toList();
     messageList.removeFirst();
+    QString s = "";
     if (messageList.size()>0) {
         for(int idx=messageList.size()-1; idx--; idx<=0) {
             QVariantMap messageMap = messageList.value(idx).toMap();
@@ -39,7 +40,7 @@ Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWid
             if (isUnread) {
                 readStateWrapper = "background-color: #E1E7ED;";
             }
-            ui->textBrowser->append("<table width='100%' cellspacing='0' border='0' style='"
+            s.append("<table width='100%' cellspacing='0' border='0' style='"
                                     + readStateWrapper
                                     + "'><tr><td width='50%' style='padding-left:5px; padding-top: 5px; color:#2B587A; font-weight: bold;'>"
                                     + displayName
@@ -49,6 +50,7 @@ Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWid
                                     + body
                                     + "</td></tr></table>");
         }
+        ui->webView->setHtml(s);
         connect(ui->textEdit, SIGNAL(focusIn()), this, SLOT(onFocusTextEdit()));
     }
 }
