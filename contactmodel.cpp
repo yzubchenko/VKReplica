@@ -175,8 +175,8 @@ void ContactModel::push(Contact* contact)
         switch(sortOrder) {
             case DescRating: {
                 foreach (Contact* sortedContact, *contactList) {
-                    if (sortedContact->rating <= contact->rating) {
-                        if ((sortedContact->isOnline && !sortedContact->hasUnreadMessage && contact->isOnline) || (!sortedContact->isOnline && !contact->isOnline)) {
+                    if (!sortedContact->hasUnreadMessage && sortedContact->rating <= contact->rating) {
+                        if ((sortedContact->isOnline && contact->isOnline) || (!sortedContact->isOnline && !contact->isOnline)) {
                             contactList->insert(contactList->indexOf(sortedContact),contact);
                             break;
                         }
