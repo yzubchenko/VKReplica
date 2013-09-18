@@ -39,7 +39,7 @@ signals:
 70,$user_id,$call_id -- пользователь $user_id совершил звонок имеющий идентификатор $call_id, дополнительную информацию о звонке можно получить используя метод voip.getCallInfo.*/
     void messageRemoved(QString messageId);
     void messageRecieved(QString fromId, bool isUnread);
-    void messageRecieved(QString messageId, int flags, QString fromId, QString timestamp, QString text);
+    void messageRecieved(QString messageId, bool isRead, QString fromId, uint timestamp, QString body);
     void contactIsOnline(QString userId, bool isOnline);
 public slots:
     void replyFinished(QNetworkReply* reply);

@@ -63,8 +63,16 @@ void LongPollExecutor::replyFinished(QNetworkReply *reply) {
                 }
                 //Новое сообщение
                 case 4: {
-                    QString userId = update.value(3).toString();
-                    emit messageRecieved(userId,true);
+                    QString messageId = update.value(1).toString();
+                    bool isRead = (update.value(2).toString().toUInt() % 2) == 0;
+
+                    QString fromId = update.value(3).toString();
+                    uint timestamp = update.value(4).toString().toUInt();
+                    QString body = update.value(6).toString();
+                    emit messageRecieved(messageId, isRead, fromId, timestamp, body);
+
+                    emit messageRecieved(fromId,!isRead);
+                    //4,$message_id,$flags,$from_id,$timestamp,$subject,$text,$attachments -- добавление нового сообщения
                     //TODO Передача сигнала с расширенной информацией о сообщении
                     break;
                 }
