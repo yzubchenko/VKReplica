@@ -8,10 +8,7 @@ DialogManager::DialogManager(Application *application, QWidget *parent) : QDialo
     dialogMap = new QMap<QString,Dialog*>();
     ui->setupUi(this);
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeDialog(int)));
-    connect(this->application->getLongPollExecutor()
-            ,SIGNAL(contactIsOnline(QString,bool))
-            ,this
-            , SLOT(onContactOnlineChange(QString,bool)));
+    connect(this->application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(onContactOnlineChange(QString,bool)));
 }
 
 DialogManager::~DialogManager() {

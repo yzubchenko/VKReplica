@@ -20,9 +20,8 @@ public:
     void showDialog(Contact* contact);
 public slots:
     void closeDialog(int idx);
-    void onContactOnlineChange(QString userId, bool isOnline);
 private slots:
-
+    void onContactOnlineChange(QString userId, bool isOnline);
 private:
     Application *application;
     Ui::DialogManager *ui;
