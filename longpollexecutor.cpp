@@ -2,6 +2,7 @@
 #include <QJsonDocument>
 #include <connection/customnetworkmanager.h>
 #include "application.h"
+#include "qmath.h"
 
 LongPollExecutor::LongPollExecutor(Application *application, QObject *parent) : QObject(parent) {
     this->application = application;
@@ -18,7 +19,6 @@ LongPollExecutor::LongPollExecutor(Application *application, QObject *parent) : 
     this->server = longPollConfigMap.value("server").toString();
     this->key = longPollConfigMap.value("key").toString();
     this->ts = longPollConfigMap.value("ts").toString();
-    int i =0;
 }
 
 void LongPollExecutor::sendRequest() {
@@ -33,6 +33,20 @@ void LongPollExecutor::sendRequest() {
 
     QByteArray buffer;
     networkAccessManager->get(*request);
+}
+
+QList<int> LongPollExecutor::parseFlags(int flags) {
+    QList<int> parsedFlags;
+    int flag = 512;
+    while (flags > 0) {
+        flag /= 2;
+        if (flags >= flag) {
+            flags -= flag;
+            parsedFlags.push_front(flag);
+        }
+    }
+    return parsedFlags;
+
 }
 
 
@@ -61,19 +75,41 @@ void LongPollExecutor::replyFinished(QNetworkReply *reply) {
                 case 0: {
                     break;
                 }
+                //Замена флагов сообщения
+                case 1: {
+                    break;
+                }
+                //Установка флагов сообщения
+                case 2: {
+                    break;
+                }
+                //Cброс флагов сообщения
+                case 3: {
+                    QList<int> parsedFlags = parseFlags(update.value(2).toString().toUInt());
+                    bool isRead = parsedFlags.contains(F_UNREAD);
+                    if (isRead) {
+                        QString messageId = update.value(1).toString();
+                        emit messageIsRead(messageId);
+                    }
+                    break;
+                }
                 //Новое сообщение
                 case 4: {
-                    QString messageId = update.value(1).toString();
-                    bool isRead = (update.value(2).toString().toUInt() % 2) == 0;
+                    QList<int> parsedFlags = parseFlags(update.value(2).toString().toUInt());
+                    if (!parsedFlags.contains(F_DELETED)) {
+                        QString messageId = update.value(1).toString();
 
-                    QString fromId = update.value(3).toString();
-                    uint timestamp = update.value(4).toString().toUInt();
-                    QString body = update.value(6).toString();
-                    emit messageRecieved(messageId, isRead, fromId, timestamp, body);
+                        bool isRead = !parsedFlags.contains(F_UNREAD);
+                        bool isOutbox = parsedFlags.contains(F_OUTBOX);
+                        QString fromId = update.value(3).toString();
+                        uint timestamp = update.value(4).toString().toUInt();
+                        QString body = update.value(6).toString();
+                        emit messageRecieved(messageId, isOutbox, isRead, fromId, timestamp, body);
 
-                    emit messageRecieved(fromId,!isRead);
-                    //4,$message_id,$flags,$from_id,$timestamp,$subject,$text,$attachments -- добавление нового сообщения
-                    //TODO Передача сигнала с расширенной информацией о сообщении
+                        if (!isOutbox) {
+                            emit messageRecieved(fromId,!isRead);
+                        }
+                    }
                     break;
                 }
                 //Контакт онлайн

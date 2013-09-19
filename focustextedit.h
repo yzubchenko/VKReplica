@@ -8,7 +8,7 @@ class FocusTextEdit : public QTextEdit
     Q_OBJECT
 public:
     explicit FocusTextEdit(QWidget *parent = 0);
-    virtual void focusInEvent(QFocusEvent *e);
+    virtual void focusInEvent(QFocusEvent *event);
 signals:
     void focusIn();
 public slots:

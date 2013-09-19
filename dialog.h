@@ -16,13 +16,13 @@ class Dialog : public QWidget
 public:
     explicit Dialog(Application *application, QString userId, QWidget *parent = 0);
     ~Dialog();
-
 public slots:
-    void insertMessage(QString messageId, bool isRead, QString fromId, uint timestamp, QString body);
+    void insertMessage(QString messageId, bool isOutbox, bool isRead, QString userId, uint timestamp, QString body);
+    void markInboxRead();
+    void markMessageIsRead(QString messageId);
+    void sendMessage();
 private slots:
     void scrollToBottom(QSize s);
-    void markMessageIsRead();
-    void scheduleMarkRead();
 private:
     Ui::Dialog *ui;
     Application *application;
@@ -30,9 +30,9 @@ private:
     QStringList *unreadInList;
 
     void setupUi();
+    void connectSendMessageTriggers();
     void loadHistory(int count);
     QString prepareMessageHtml(QString messageId, QString fromId, uint timestamp, QString body, bool isRead);
-
 };
 
 #endif // DIALOG_H

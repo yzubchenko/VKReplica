@@ -13,6 +13,7 @@
 #include "longpollexecutor.h"
 #include "application.h"
 #include "dialog.h"
+#include "qmath.h"
 
 #include <QJsonObject>
 

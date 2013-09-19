@@ -44,8 +44,8 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
     QMap<QString, QString> *map = new QMap<QString, QString>();
     map->insert("order", "hints");
     map->insert("fields","online");
-    QJsonObject response = this->application->getApiMethodExecutor()->executeMethod("friends.get",*map);
-    QVariantList contactJsonList = (response.toVariantMap().take("response")).toList();
+    QJsonObject result = this->application->getApiMethodExecutor()->executeMethod("friends.get",*map);
+    QVariantList contactJsonList = result.toVariantMap().take("response").toMap().take("items").toList();
 
     //Заполнение списка контактов и списка порядка
     this->contactList = new QList<Contact*>();
@@ -55,7 +55,7 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
         QMap<QString, QVariant> valueMap = value.toMap();
         QString userId = QString::number(
             static_cast< int >(
-                (double)valueMap.value("user_id").toDouble()
+                (double)valueMap.value("id").toDouble()
             )
         );
         QString displayName =
@@ -89,11 +89,10 @@ void ContactModel::checkUnreadMessages() {
     QMap<QString,QString> params;
     params.insert("filters","1");
     QJsonObject result = application->getApiMethodExecutor()->executeMethod("messages.get",params);
-    QVariantList responseList = result.toVariantMap().value("response").toList();
-    //Начинаем с 1, потому что 0 элемент - количество сообщений
-    for (int idx=1;idx<responseList.size();idx++) {
-        QMap<QString,QVariant> message = responseList.at(idx).toMap();
-        QString userId = message.value("uid").toString();
+
+    QVariantList unreadMessageList = result.toVariantMap().take("response").toMap().take("items").toList();
+    foreach (QVariant unreadMessage, unreadMessageList) {
+        QString userId = unreadMessage.toMap().value("user_id").toString();
         findByUserId(userId)->hasUnreadMessage = true;
     }
 }

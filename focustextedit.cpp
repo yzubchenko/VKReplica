@@ -6,7 +6,7 @@ FocusTextEdit::FocusTextEdit(QWidget *parent) : QTextEdit(parent){
 
 }
 
-void FocusTextEdit::focusInEvent(QFocusEvent *e) {
-    QTextEdit::focusInEvent(e);
+void FocusTextEdit::focusInEvent(QFocusEvent *event) {
+    QTextEdit::focusInEvent(event);
     emit focusIn();
 }

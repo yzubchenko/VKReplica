@@ -24,6 +24,18 @@ private:
     bool started = false;
 
     void sendRequest();
+
+    const uint F_UNREAD = 1;
+    const uint F_OUTBOX = 2;
+    const uint F_REPLIED = 4;
+    const uint F_IMPORTANT = 8;
+    const uint F_CHAT = 16;
+    const uint F_FRIENDS = 32;
+    const uint F_SPAM = 64;
+    const uint F_DELETED = 128;
+    const uint F_FIXED = 256;
+    const uint F_MEDIA = 512;
+    QList<int> parseFlags(int flags);
 signals:
     /*0,$message_id,0 -- удаление сообщения с указанным local_id
 1,$message_id,$flags -- замена флагов сообщения (FLAGS:=$flags)
@@ -38,8 +50,9 @@ signals:
 62,$user_id,$chat_id -- пользователь $user_id начал набирать текст в беседе $chat_id.
 70,$user_id,$call_id -- пользователь $user_id совершил звонок имеющий идентификатор $call_id, дополнительную информацию о звонке можно получить используя метод voip.getCallInfo.*/
     void messageRemoved(QString messageId);
+    void messageIsRead(QString messageId);
     void messageRecieved(QString fromId, bool isUnread);
-    void messageRecieved(QString messageId, bool isRead, QString fromId, uint timestamp, QString body);
+    void messageRecieved(QString messageId, bool isOutBox, bool isRead, QString userId, uint timestamp, QString body);
     void contactIsOnline(QString userId, bool isOnline);
 public slots:
     void replyFinished(QNetworkReply* reply);

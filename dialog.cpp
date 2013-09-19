@@ -6,6 +6,9 @@
 #include <QWebFrame>
 #include <QWebElement>
 #include <QTimer>
+#include <QShortcut>
+
+
 
 
 
@@ -18,7 +21,7 @@ Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWid
     connect(ui->textEdit
             , SIGNAL(focusIn())
             , this
-            , SLOT(scheduleMarkRead()));
+            , SLOT(markInboxRead()));
     connect(ui->webView->page()->mainFrame()
             , SIGNAL(contentsSizeChanged(QSize))
             , this
@@ -27,9 +30,14 @@ Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWid
     loadHistory(5);
 
     connect(application->getLongPollExecutor()
-            , SIGNAL(messageRecieved(QString,bool,QString,uint,QString))
+            , SIGNAL(messageRecieved(QString,bool, bool,QString,uint,QString))
             , this
-            , SLOT(insertMessage(QString,bool,QString,uint,QString)));
+            , SLOT(insertMessage(QString,bool, bool,QString,uint,QString)));
+    connect(application->getLongPollExecutor()
+            , SIGNAL(messageIsRead(QString))
+            , this
+            , SLOT(markMessageIsRead(QString)));
+    connectSendMessageTriggers();
 }
 
 void Dialog::setupUi() {
@@ -39,20 +47,28 @@ void Dialog::setupUi() {
     ui->splitter->setSizes(list);
 }
 
+void Dialog::connectSendMessageTriggers() {
+    connect(ui->pushButton, SIGNAL(released()), this, SLOT(sendMessage()));
+    QShortcut* shortcutCtrlEnter = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->textEdit);
+    connect(shortcutCtrlEnter, SIGNAL(activated()), this, SLOT(sendMessage()));
+    QShortcut* shortcutCtrlNumEnter = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Enter), ui->textEdit);
+    connect(shortcutCtrlNumEnter, SIGNAL(activated()), this, SLOT(sendMessage()));
+}
+
 void Dialog::loadHistory(int count) {
     QMap<QString,QString> params;
     params.insert("count", QString::number(count));
     params.insert("user_id",userId);
 
-    QJsonObject historyJson = application->getApiMethodExecutor()->executeMethod("messages.getHistory",params);
-    QVariantList messageList = historyJson.toVariantMap().value("response").toList();
-    messageList.removeFirst();
+    QJsonObject result = application->getApiMethodExecutor()->executeMethod("messages.getHistory",params);
+    QVariantList messageList = result.toVariantMap().take("response").toMap().take("items").toList();
+    //messageList.removeFirst();
     QString historyHtml = "";
     if (messageList.size()>0) {
         for(int idx=messageList.size()-1; idx--; idx<=0) {
             QVariantMap messageMap = messageList.value(idx).toMap();
 
-            QString messageId = messageMap.value("mid").toString();
+            QString messageId = messageMap.value("id").toString();
             QString fromId = messageMap.value("from_id").toString();
             uint timestamp = messageMap.value("date").toString().toUInt();
             QString body = messageMap.value("body").toString();
@@ -64,9 +80,12 @@ void Dialog::loadHistory(int count) {
     ui->webView->setHtml(historyHtml);
 }
 
-void Dialog::insertMessage(QString messageId, bool isRead, QString fromId, uint timestamp, QString body) {
-    QString messageHtml = prepareMessageHtml(messageId, fromId, timestamp, body, isRead);
-    ui->webView->setHtml(ui->webView->page()->mainFrame()->toHtml()+messageHtml);
+void Dialog::insertMessage(QString messageId, bool isOutbox, bool isRead, QString userId, uint timestamp, QString body) {
+    if (userId == this->userId) {
+        QString fromId = isOutbox ? application->getUserId() : userId;
+        QString messageHtml = prepareMessageHtml(messageId, fromId, timestamp, body, isRead);
+        ui->webView->setHtml(ui->webView->page()->mainFrame()->toHtml()+messageHtml);
+    }
 }
 
 QString Dialog::prepareMessageHtml(QString messageId, QString fromId, uint timestamp, QString body, bool isRead) {
@@ -98,27 +117,53 @@ QString Dialog::prepareMessageHtml(QString messageId, QString fromId, uint times
     return messageHtml;
 }
 
-
-void Dialog::markMessageIsRead() {
+void Dialog::markInboxRead() {
     application->getContactModel()->acceptUnreadMessage(userId,false);
+    QString messageIds = "";
     while (unreadInList->count()>0) {
         QString messageId = unreadInList->takeFirst();
-        QString query = "#m"+messageId;
-        QWebElement messageElement = ui->webView->page()->mainFrame()->findFirstElement(query);
-        if (!messageElement.isNull()) {
-            messageElement.setStyleProperty("background-color","#FFFFFF");
-        } else {
-            qDebug() << "there is no message with id = " + messageId;
+        markMessageIsRead(messageId);
+        messageIds.append(messageId);
+        if (unreadInList->count()>1) {
+            messageIds.append(",");
         }
+    }
+    QMap<QString,QString> params;
+    params.insert("message_ids", messageIds);
+    params.insert("user_id",this->userId);
+    QJsonObject response = application->getApiMethodExecutor()->executeMethod("messages.markAsRead",params);
+
+    if (response.toVariantMap().value("response").toString().toInt() != 1) {
+        qDebug() << "mark message as read FAILURE";
     }
 }
 
-void Dialog::scheduleMarkRead() {
-    QTimer *markReadTimer = new QTimer();
-    connect(markReadTimer, SIGNAL(timeout()), this, SLOT(markMessageIsRead()));
-    connect(markReadTimer, SIGNAL(timeout()), markReadTimer, SLOT(deleteLater()));
-    markReadTimer->start(1000);
+void Dialog::markMessageIsRead(QString messageId) {
+    QString query = "#m"+messageId;
+    QWebElement messageElement = ui->webView->page()->mainFrame()->findFirstElement(query);
+    if (!messageElement.isNull()) {
+        messageElement.setStyleProperty("background-color","#FFFFFF");
+    } else {
+        qDebug() << "there is no message with id = " + messageId;
+    }
+
 }
+
+void Dialog::sendMessage() {
+    QString messageText = ui->textEdit->toPlainText();
+    if (!messageText.isEmpty()) {
+        QMap<QString,QString> params;
+       // params.insert("user_id", userId);
+        params.insert("message", messageText);
+        params.insert("user_ids", userId);
+        params.insert("type","1");
+
+        QJsonObject response = application->getApiMethodExecutor()->executeMethod("messages.send",params);
+        ui->textEdit->clear();
+    }
+}
+
+
 
 void Dialog::scrollToBottom(QSize size){
     ui->webView->page()->mainFrame()->setScrollBarValue(Qt::Vertical, size.height());

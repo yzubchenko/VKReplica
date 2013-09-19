@@ -17,7 +17,9 @@ QJsonObject ApiMethodExecutor::executeMethod(QString methodName, QMap<QString, Q
     foreach (QString paramName, params.keys()) {
         urlStr.append(paramName).append("=").append(params.value(paramName)).append("&");
     }
+    urlStr.append("v=5.1&");
     urlStr.append("access_token=").append(token);
+
     QUrl *url = new QUrl(urlStr);
     QNetworkRequest *request = new QNetworkRequest(*url);
     request->setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
