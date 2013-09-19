@@ -163,6 +163,11 @@ void Dialog::sendMessage() {
     }
 }
 
+void Dialog::setUserOnline(bool isOnline) {
+    QString text = isOnline ? "В сети" : "Не в сети";
+    ui->label->setText(text);
+}
+
 
 
 void Dialog::scrollToBottom(QSize size){

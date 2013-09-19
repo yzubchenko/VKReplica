@@ -13,7 +13,6 @@
 #include "longpollexecutor.h"
 #include "application.h"
 #include "dialog.h"
-#include "qmath.h"
 
 #include <QJsonObject>
 
@@ -26,13 +25,13 @@ void Application::exec() {
     auth->exec();
 
     apiMethodExecutor = new ApiMethodExecutor(auth->getToken(),this);
+    longPollExecutor = new LongPollExecutor(this,this);
 
     applyUser();
 
     MainWindow *mainWindow = new MainWindow(this);
     mainWindow->show();
 
-    longPollExecutor = new LongPollExecutor(this,this);
     contactModel = new ContactModel(this,this);
     mainWindow->applyContactModel(contactModel);
 

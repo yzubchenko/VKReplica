@@ -15,12 +15,15 @@ class Dialog : public QWidget
 
 public:
     explicit Dialog(Application *application, QString userId, QWidget *parent = 0);
+    QString getUserId() const {return userId;}
+    void setUserOnline(bool isOnline);
     ~Dialog();
 public slots:
     void insertMessage(QString messageId, bool isOutbox, bool isRead, QString userId, uint timestamp, QString body);
     void markInboxRead();
     void markMessageIsRead(QString messageId);
     void sendMessage();
+
 private slots:
     void scrollToBottom(QSize s);
 private:
