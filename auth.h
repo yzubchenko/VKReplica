@@ -16,12 +16,14 @@ private:
     QString token;
     QString userId;
     QString expiresIn;
-    QEventLoop *eventoLoop;
+    QUrl *url;
+    bool isLogin;
 
     QMap<QString, QString>* parseReplyFragment(QString authFragment);
+    void refreshWebView();
+    void calculateWebViewGeometry();
 public:
     explicit Auth(QObject *parent = 0);
-    void exec();
 
     QString getToken() const { return token; }
 
@@ -29,14 +31,15 @@ public:
 
     QString getExpiresIn() const { return expiresIn; }
 
-    QRect * setWebViewGeometry();
-    void calculateWebViewGeometry();
-    ~Auth();
-signals:
 
+    ~Auth();
+
+signals:
+    void authStatusChanged(bool isLogin);
 public slots:
     void handleReply(QNetworkReply *reply);
     void showAuthDialog();
+    void changeAuthStatus();
 
 };
 

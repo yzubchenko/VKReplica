@@ -4,9 +4,11 @@
 #include <QObject>
 #include "auth.h"
 #include "apimethodexecutor.h"
+
 class ContactModel;
 
 class LongPollExecutor;
+class MainWindow;
 
 class Application : public QObject
 {
@@ -21,6 +23,7 @@ public:
     ContactModel *getContactModel() const {return contactModel;}
     QString getUserDisplayName() const {return userDisplayName;}
     QString getUserId() const {return userId;}
+    Auth* getAuth() const { return auth; }
 
 
 private:
@@ -30,13 +33,14 @@ private:
     ContactModel *contactModel;
     QString userDisplayName;
     QString userId;
+    MainWindow *mainWindow;
 
     void applyUser();
 
 signals:
 
-public slots:
-
+private slots:
+    void onAuthStatusChanged(bool isLogin);
 };
 
 #endif // APPLICATION_H

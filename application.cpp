@@ -5,6 +5,7 @@
 #include <QDebug>
 
 #include <QApplication>
+#include <QStandardPaths>
 #include <QWidget>
 
 #include <QMap>
@@ -13,6 +14,7 @@
 #include "longpollexecutor.h"
 #include "application.h"
 #include "dialog.h"
+#include "mainwindow.h"
 
 #include <QJsonObject>
 
@@ -22,20 +24,12 @@ Application::Application(QObject *parent) : QObject(parent) {
 
 void Application::exec() {
     auth = new Auth(this);
-    auth->exec();
-
-    apiMethodExecutor = new ApiMethodExecutor(auth->getToken(),this);
-    longPollExecutor = new LongPollExecutor(this,this);
-
-    applyUser();
-
-    MainWindow *mainWindow = new MainWindow(this);
-    mainWindow->show();
+    connect(auth, SIGNAL(authStatusChanged(bool)), this, SLOT(onAuthStatusChanged(bool)));
+    auth->showAuthDialog();
 
     contactModel = new ContactModel(this,this);
-    mainWindow->applyContactModel(contactModel);
-
-    longPollExecutor->start();
+    mainWindow = new MainWindow(this, contactModel);
+    mainWindow->show();
 }
 
 void Application::applyUser() {
@@ -46,6 +40,20 @@ void Application::applyUser() {
     QVariantMap user = userJson.value("response").toVariant().toList().value(0).toMap();
     this->userDisplayName = user.value("first_name").toString() + " " + user.value("last_name").toString();
     this->userId = auth->getUserId();
+}
+
+void Application::onAuthStatusChanged(bool isLogin) {
+    if (isLogin) {
+        apiMethodExecutor = new ApiMethodExecutor(auth->getToken(),this);
+        longPollExecutor = new LongPollExecutor(this,this);
+        applyUser();
+    } else {
+        apiMethodExecutor->deleteLater();
+        longPollExecutor->deleteLater();
+        userDisplayName = QString();
+        userId = QString();
+    }
+    mainWindow->applyAuthStatus(isLogin);
 }
 
 Application::~Application() {

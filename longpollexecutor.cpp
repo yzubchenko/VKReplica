@@ -51,8 +51,10 @@ QList<int> LongPollExecutor::parseFlags(int flags) {
 
 
 void LongPollExecutor::start() {
-    started=true;
-    sendRequest();
+    if (!started) {
+        started=true;
+        sendRequest();
+    }
 
 }
 

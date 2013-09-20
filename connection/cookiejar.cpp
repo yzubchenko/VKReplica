@@ -136,7 +136,7 @@ void CookieJar::save()
     purgeOldCookies();
     QString directory = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     if (directory.isEmpty())
-        directory = QDir::homePath() + QLatin1String("/.") + "VKReply";
+        directory = QDir::homePath() + QLatin1String("/.") + "VKReplica";
     if (!QFile::exists(directory)) {
         QDir dir;
         dir.mkpath(directory);

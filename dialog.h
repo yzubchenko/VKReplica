@@ -26,6 +26,7 @@ public slots:
 
 private slots:
     void scrollToBottom(QSize s);
+    void checkSendAvailable();
 private:
     Ui::Dialog *ui;
     Application *application;

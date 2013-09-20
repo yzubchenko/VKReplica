@@ -48,6 +48,9 @@ void Dialog::setupUi() {
 }
 
 void Dialog::connectSendMessageTriggers() {
+    //ui->pushButton->setEnabled(false);
+    //connect(ui->textEdit, SIGNAL(textChanged()), this, SLOT(checkSendAvailable()));
+
     connect(ui->pushButton, SIGNAL(released()), this, SLOT(sendMessage()));
     QShortcut* shortcutCtrlEnter = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->textEdit);
     connect(shortcutCtrlEnter, SIGNAL(activated()), this, SLOT(sendMessage()));
@@ -172,6 +175,13 @@ void Dialog::setUserOnline(bool isOnline) {
 
 void Dialog::scrollToBottom(QSize size){
     ui->webView->page()->mainFrame()->setScrollBarValue(Qt::Vertical, size.height());
+}
+
+void Dialog::checkSendAvailable() {
+    bool isEnabled = !ui->textEdit->toPlainText().isEmpty();
+    if (ui->pushButton->isEnabled() != isEnabled) {
+        ui->pushButton->setEnabled(isEnabled);
+    }
 }
 
 Dialog::~Dialog() {

@@ -6,6 +6,7 @@
     </qresource>
     <qresource prefix="/dialog">
         <file>resources/sendButton.png</file>
-        <file>resources/exitButton.png</file>
+        <file>resources/loginButton.png</file>
+        <file>resources/logoutButton.png</file>
     </qresource>
 </RCC>

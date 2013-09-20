@@ -39,12 +39,15 @@ bool descRating(const Contact* c1 , const Contact* c2 ) {
 
 ContactModel::ContactModel(Application *application, QObject *parent) : QAbstractListModel(parent) {
     this->application = application;
+}
 
-    //Запрос контактов по API
+
+
+void ContactModel::load() {
     QMap<QString, QString> *map = new QMap<QString, QString>();
     map->insert("order", "hints");
     map->insert("fields","online");
-    QJsonObject result = this->application->getApiMethodExecutor()->executeMethod("friends.get",*map);
+    QJsonObject result = application->getApiMethodExecutor()->executeMethod("friends.get",*map);
     QVariantList contactJsonList = result.toVariantMap().take("response").toMap().take("items").toList();
 
     //Заполнение списка контактов и списка порядка
@@ -83,6 +86,14 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
     }
     connect(application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
     connect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
+}
+
+
+/*Запрос контактов по API*/
+void ContactModel::unload() {
+    contactList->clear();
+    disconnect(application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
+    disconnect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
 }
 
 void ContactModel::checkUnreadMessages() {

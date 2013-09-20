@@ -89,7 +89,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
-       <number>4</number>
+       <number>2</number>
       </property>
       <property name="leftMargin">
        <number>4</number>
@@ -124,14 +124,30 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QToolButton" name="statusButton">
         <property name="text">
-         <string>В сети</string>
+         <string>Не в сети</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/contacts/resources/offline.png</normaloff>:/contacts/resources/offline.png</iconset>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::MenuButtonPopup</enum>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::NoArrow</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="authButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -161,7 +177,7 @@
         </property>
         <property name="icon">
          <iconset resource="resources.qrc">
-          <normaloff>:/dialog/resources/exitButton.png</normaloff>:/dialog/resources/exitButton.png</iconset>
+          <normaloff>:/dialog/resources/loginButton.png</normaloff>:/dialog/resources/loginButton.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -202,6 +218,26 @@
     <bool>false</bool>
    </attribute>
   </widget>
+  <action name="offlineAction">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/contacts/resources/offline.png</normaloff>
+     <normalon>:/contacts/resources/offline.png</normalon>:/contacts/resources/offline.png</iconset>
+   </property>
+   <property name="text">
+    <string>Не в сети</string>
+   </property>
+  </action>
+  <action name="onlineAction">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/contacts/resources/online.png</normaloff>
+     <normalon>:/contacts/resources/online.png</normalon>:/contacts/resources/online.png</iconset>
+   </property>
+   <property name="text">
+    <string>В сети</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

@@ -8,46 +8,57 @@
 
 #include <QUrl>
 #include <QDebug>
+#include <QStandardPaths>
 #include "errordialog.h"
+#include <QFile>
+#include <QDir>
+#include <connection/cookiejar.h>
 
 /*Конструктор*/
 Auth::Auth(QObject *parent) : QObject(parent) {
-    eventoLoop = new QEventLoop(this);
-
-    CustomNetworkAccessManager *networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone);
-    networkAccessManager->connect(networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleReply(QNetworkReply*)));
-
+    url = new QUrl("https://oauth.vk.com/authorize?client_id=3860301&scope=friends,audio,status,messages&redirect_uri=https://oauth.vk.com/blank.html&display=page&v=5.0&response_type=token");
     webView = new QWebView();
-    webView->page()->setNetworkAccessManager(networkAccessManager);
-    calculateWebViewGeometry();
     webView->setWindowTitle("VK Replica - Авторизация");
-
-
+    calculateWebViewGeometry();
+    refreshWebView();
 }
 
 /*Расчет геометрии окна авторизации*/
-void Auth::calculateWebViewGeometry()
-{
-    const QRect screenRect = QApplication::desktop()->rect();
-    QRect *webViewRect = new QRect(screenRect.width()/2-304, screenRect.height()/2-157,607,314);
-    webView->setGeometry(*webViewRect);
+void Auth::calculateWebViewGeometry() {
+    //const QRect screenRect = QApplication::desktop()->rect();
+    //QRect *webViewRect = new QRect(screenRect.width()/2-304, screenRect.height()/2-157,607,314);
+   // webView->setGeometry(*webViewRect); /**Windows 2 screen bug**/
     webView->setFixedSize(QSize(607,314));
 }
 
-
-/*Запуск процесса авторизации*/
-void Auth::exec() {
-    qDebug() << "request auth";
-    showAuthDialog();
-    eventoLoop->exec();
+void Auth::refreshWebView() {
+    webView->setHtml("");
+    CustomNetworkAccessManager *networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone);
+    networkAccessManager->connect(networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleReply(QNetworkReply*)));
+    webView->page()->setNetworkAccessManager(networkAccessManager);
 }
 
 /*Отображает окно логина*/
-void Auth::showAuthDialog() {
-    QUrl *url = new QUrl("https://oauth.vk.com/authorize?client_id=3860301&scope=friends,audio,status,messages&redirect_uri=https://oauth.vk.com/blank.html&display=page&v=5.0&response_type=token");
+void Auth::showAuthDialog() {  
+    qDebug() << "request auth";
+
     webView->load(*url);
     webView->show();
+}
 
+void Auth::changeAuthStatus() {
+    if (webView->isHidden()) {
+        if (isLogin) {
+            QString cookiePath = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/cookies.ini");
+            QFile file(cookiePath);
+            file.remove();
+            isLogin = false;
+            emit authStatusChanged(isLogin);
+        } else {
+            refreshWebView();
+            showAuthDialog();
+        }
+    }
 }
 
 /*Обработчик ответа на запрос авторизации*/
@@ -66,7 +77,8 @@ void Auth::handleReply(QNetworkReply *reply) {
                 userId = parsedReply->take("user_id");
                 expiresIn = parsedReply->take("expires_in");
                 qDebug() << "auth complete\r\n";
-                eventoLoop->quit();
+                isLogin = true;
+                emit authStatusChanged(isLogin);
             }
         }
     }

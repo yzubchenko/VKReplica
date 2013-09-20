@@ -44,6 +44,8 @@ public:
 
     void push(Contact* contact);
     void refreshContact(Contact* contact);
+    void load();
+    void unload();
 private:
     Application* application;
     QList<Contact*>* contactList;
