@@ -112,18 +112,28 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>88</width>
-          <height>25</height>
+          <width>90</width>
+          <height>27</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>90</width>
+          <height>27</height>
          </size>
         </property>
         <property name="styleSheet">
          <string notr="true">background-image: url(:/dialog/resources/sendButton.png);</string>
         </property>
-        <property name="default">
-         <bool>true</bool>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/dialog/resources/sendButton.png</normaloff>:/dialog/resources/sendButton.png</iconset>
         </property>
-        <property name="flat">
-         <bool>true</bool>
+        <property name="iconSize">
+         <size>
+          <width>88</width>
+          <height>25</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -177,6 +187,8 @@
   <tabstop>textEdit</tabstop>
   <tabstop>pushButton</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -19,11 +19,11 @@ MainWindow::MainWindow(Application *app, QWidget *parent) : QMainWindow(parent),
 //    const QRect screenRect = QApplication::desktop()->rect();
 //    QRect *mainWindowRect = new QRect((screenRect.width()-260), (screenRect.height()-400), 260, 400);
 //    this->setGeometry(*mainWindowRect); /**Windows 2 screen bug**/
-
+    ui->usernameLabel->setText(application->getUserDisplayName());
     ContactDelegate* htmlDelegate = new ContactDelegate();
     ui->listView->setItemDelegate(htmlDelegate);
-    this->connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)),this, SLOT(showDialog(QModelIndex)));
-    dialogManager = new DialogManager(application,this);
+    connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)),this, SLOT(showDialog(QModelIndex)));
+    dialogManager = new DialogManager(application,0);
 }
 
 void MainWindow::applyContactModel(ContactModel *contactModel) {

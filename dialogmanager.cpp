@@ -7,6 +7,12 @@ DialogManager::DialogManager(Application *application, QWidget *parent) : QDialo
     this->application = application;
     dialogMap = new QMap<QString,Dialog*>();
     ui->setupUi(this);
+    Qt::WindowFlags flags = Qt::Window | Qt::WindowSystemMenuHint
+                                | Qt::WindowMinimizeButtonHint
+                                | Qt::WindowMaximizeButtonHint
+                                | Qt::WindowCloseButtonHint;
+    this->setWindowFlags(flags);
+
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeDialog(int)));
     connect(this->application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(onContactOnlineChange(QString,bool)));
 }
