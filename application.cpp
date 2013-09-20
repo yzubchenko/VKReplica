@@ -23,13 +23,15 @@ Application::Application(QObject *parent) : QObject(parent) {
 
 
 void Application::exec() {
-    auth = new Auth(this);
+    auth = new Auth();
     connect(auth, SIGNAL(authStatusChanged(bool)), this, SLOT(onAuthStatusChanged(bool)));
     auth->showAuthDialog();
 
     contactModel = new ContactModel(this,this);
     mainWindow = new MainWindow(this, contactModel);
     mainWindow->show();
+
+
 }
 
 void Application::applyUser() {

@@ -15,10 +15,13 @@
 #include <connection/cookiejar.h>
 
 /*Конструктор*/
-Auth::Auth(QObject *parent) : QObject(parent) {
+Auth::Auth(QWidget *parent) : QWidget(parent) {
     url = new QUrl("https://oauth.vk.com/authorize?client_id=3860301&scope=friends,audio,status,messages&redirect_uri=https://oauth.vk.com/blank.html&display=page&v=5.0&response_type=token");
-    webView = new QWebView();
+    webView = new QWebView(parent);
     webView->setWindowTitle("VK Replica - Авторизация");
+    Qt::WindowFlags flags = Qt::Window | Qt::WindowCloseButtonHint;
+    webView->setWindowFlags(flags);
+    webView->setWindowModality(Qt::ApplicationModal);
     calculateWebViewGeometry();
     refreshWebView();
 }
@@ -58,6 +61,8 @@ void Auth::changeAuthStatus() {
             refreshWebView();
             showAuthDialog();
         }
+    } else {
+        webView->activateWindow();
     }
 }
 

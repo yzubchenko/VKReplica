@@ -8,10 +8,6 @@
 #include <QTimer>
 #include <QShortcut>
 
-
-
-
-
 Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWidget(parent), ui(new Ui::Dialog) {
     this->application = application;
     this->userId = userId;
@@ -48,9 +44,6 @@ void Dialog::setupUi() {
 }
 
 void Dialog::connectSendMessageTriggers() {
-    //ui->pushButton->setEnabled(false);
-    //connect(ui->textEdit, SIGNAL(textChanged()), this, SLOT(checkSendAvailable()));
-
     connect(ui->pushButton, SIGNAL(released()), this, SLOT(sendMessage()));
     QShortcut* shortcutCtrlEnter = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->textEdit);
     connect(shortcutCtrlEnter, SIGNAL(activated()), this, SLOT(sendMessage()));
@@ -85,9 +78,11 @@ void Dialog::loadHistory(int count) {
 
 void Dialog::insertMessage(QString messageId, bool isOutbox, bool isRead, QString userId, uint timestamp, QString body) {
     if (userId == this->userId) {
-        QString fromId = isOutbox ? application->getUserId() : userId;
-        QString messageHtml = prepareMessageHtml(messageId, fromId, timestamp, body, isRead);
-        ui->webView->setHtml(ui->webView->page()->mainFrame()->toHtml()+messageHtml);
+        if (findMessageElement(messageId).isNull()) { //Для защиты от повторного добавления
+            QString fromId = isOutbox ? application->getUserId() : userId;
+            QString messageHtml = prepareMessageHtml(messageId, fromId, timestamp, body, isRead);
+            ui->webView->setHtml(ui->webView->page()->mainFrame()->toHtml()+messageHtml);
+        }
     }
 }
 
@@ -99,7 +94,6 @@ QString Dialog::prepareMessageHtml(QString messageId, QString fromId, uint times
         displayName = application->getContactModel()->findByUserId(fromId)->displayName;
     }
     QString formattedDate = QDateTime::fromTime_t(timestamp).toString("dd.MM.yyyy hh:mm:ss");
-
     QString readStateHtml = isRead ? "background-color: #FFFFFF;" : "background-color: #E1E7ED;";
     QString messageHtml =
             "<div id='m"
@@ -141,9 +135,14 @@ void Dialog::markInboxRead() {
     }
 }
 
-void Dialog::markMessageIsRead(QString messageId) {
+QWebElement Dialog::findMessageElement(QString messageId) {
     QString query = "#m"+messageId;
     QWebElement messageElement = ui->webView->page()->mainFrame()->findFirstElement(query);
+    return messageElement;
+}
+
+void Dialog::markMessageIsRead(QString messageId) {
+    QWebElement messageElement = findMessageElement(messageId);
     if (!messageElement.isNull()) {
         messageElement.setStyleProperty("background-color","#FFFFFF");
     } else {

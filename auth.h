@@ -8,7 +8,7 @@
 #include <QMap>
 #include <QEventLoop>
 
-class Auth : public QObject
+class Auth : public QWidget
 {
     Q_OBJECT
 private:
@@ -23,7 +23,7 @@ private:
     void refreshWebView();
     void calculateWebViewGeometry();
 public:
-    explicit Auth(QObject *parent = 0);
+    explicit Auth(QWidget *parent = 0);
 
     QString getToken() const { return token; }
 

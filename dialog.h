@@ -18,6 +18,7 @@ public:
     QString getUserId() const {return userId;}
     void setUserOnline(bool isOnline);
     ~Dialog();
+
 public slots:
     void insertMessage(QString messageId, bool isOutbox, bool isRead, QString userId, uint timestamp, QString body);
     void markInboxRead();
@@ -37,6 +38,7 @@ private:
     void connectSendMessageTriggers();
     void loadHistory(int count);
     QString prepareMessageHtml(QString messageId, QString fromId, uint timestamp, QString body, bool isRead);
+    QWebElement findMessageElement(QString messageId);
 };
 
 #endif // DIALOG_H

@@ -25,6 +25,7 @@ MainWindow::MainWindow(Application *app, ContactModel *contactModel, QWidget *pa
 //    const QRect screenRect = QApplication::desktop()->rect();
 //    QRect *mainWindowRect = new QRect((screenRect.width()-260), (screenRect.height()-400), 260, 400);
 //    this->setGeometry(*mainWindowRect); /**Windows 2 screen bug**/
+    ui->statusButton->setEnabled(false);
     ui->usernameLabel->setText("Требуется авторизация");
     ContactDelegate* htmlDelegate = new ContactDelegate();
     ui->listView->setItemDelegate(htmlDelegate);
