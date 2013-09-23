@@ -6,7 +6,14 @@
     </qresource>
     <qresource prefix="/dialog">
         <file>resources/sendButton.png</file>
+    </qresource>
+    <qresource prefix="/sounds">
+        <file>resources/message.mp3</file>
+    </qresource>
+    <qresource prefix="/main_window">
         <file>resources/loginButton.png</file>
         <file>resources/logoutButton.png</file>
+        <file>resources/onlineOnly.png</file>
+        <file>resources/allVisible.png</file>
     </qresource>
 </RCC>

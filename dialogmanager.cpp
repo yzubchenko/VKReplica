@@ -26,7 +26,9 @@ void DialogManager::showDialog(Contact* contact) {
         Dialog* dialog= new Dialog(application, contact->userId, this);
         dialog->setUserOnline(contact->isOnline);
         dialogMap->insert(contact->userId,dialog);
-        this->ui->tabWidget->addTab(dialog,contact->displayName);
+        QIcon* statusIcon = contact->isOnline ? application->getOnlineIcon() : application->getOfflineIcon();
+        this->ui->tabWidget->addTab(dialog, *statusIcon, contact->displayName);
+
     }
     Dialog *dialog = dialogMap->value(contact->userId);
     this->show();
@@ -45,6 +47,10 @@ void DialogManager::closeDialog(int idx) {
 
 void DialogManager::onContactOnlineChange(QString userId, bool isOnline) {
     if (dialogMap->contains(userId)) {
-        dialogMap->value(userId)->setUserOnline(isOnline);
+        Dialog * dialog = dialogMap->value(userId);
+        dialog->setUserOnline(isOnline);
+        int idx = ui->tabWidget->indexOf(dialog);
+        QIcon *statusIcon = isOnline ? application->getOnlineIcon() : application->getOfflineIcon();
+        ui->tabWidget->setTabIcon(idx,*statusIcon);
     }
 }

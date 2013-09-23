@@ -27,7 +27,7 @@ void ContactDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     QFont font = QApplication::font();
     QColor color;
     if (contact->isOnline) {
-        color.setRgb(0,100,0);
+        color.setRgb(0,0,0);
     } else {
         color.setRgb(128,128,128);
     }

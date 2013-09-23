@@ -40,6 +40,7 @@ public:
     QList<Contact*>* getAll() const;
     Contact* getByRow(int row);
     Contact* findByUserId(QString userId);
+    void applyContactsVisibility(bool allVisible);
 
 
     void push(Contact* contact);
@@ -49,9 +50,11 @@ public:
 private:
     Application* application;
     QList<Contact*>* contactList;
-    QList<QString>* orderList;
+    QList<Contact*>* contactStorage;
+
     SortOrder sortOrder = DescRating;
 
+    bool allVisible;
     void insert(Contact *contact, int index = -1);
     void checkUnreadMessages();
 signals:

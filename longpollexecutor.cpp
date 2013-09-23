@@ -1,5 +1,6 @@
 #include "longpollexecutor.h"
 #include <QJsonDocument>
+#include <QMediaPlayer>
 #include <connection/customnetworkmanager.h>
 #include "application.h"
 #include "qmath.h"
@@ -66,8 +67,8 @@ void LongPollExecutor::replyFinished(QNetworkReply *reply) {
     if (isStarted()) {
         QString replyJsonStr = QString::fromUtf8(reply->readAll());
         QVariantMap replyMap = QJsonDocument::fromJson(replyJsonStr.toUtf8()).object().toVariantMap();
-        ts = replyMap.value("ts").toString();
-        QVariantList updates = replyMap.value("updates").toList();
+        ts = replyMap.take("ts").toString();
+        QVariantList updates = replyMap.take("updates").toList();
         if (updates.size() > 0) {
             for (int idx=0; idx<updates.size(); idx++) {
                 QVariantList update = updates.value(idx).toList();
@@ -111,6 +112,8 @@ void LongPollExecutor::replyFinished(QNetworkReply *reply) {
                         if (!isOutbox) {
                             emit messageRecieved(fromId,!isRead);
                         }
+
+
                     }
                     break;
                 }

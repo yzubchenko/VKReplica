@@ -24,7 +24,8 @@ public:
     QString getUserDisplayName() const {return userDisplayName;}
     QString getUserId() const {return userId;}
     Auth* getAuth() const { return auth; }
-
+    QIcon* getOfflineIcon() const {return offlineIcon;}
+    QIcon* getOnlineIcon() const {return onlineIcon;}
 
 private:
     Auth *auth;
@@ -34,6 +35,8 @@ private:
     QString userDisplayName;
     QString userId;
     MainWindow *mainWindow;
+    QIcon *offlineIcon = new QIcon(":/contacts/resources/offline.png");
+    QIcon *onlineIcon = new QIcon(":/contacts/resources/online.png");
 
     void applyUser();
 

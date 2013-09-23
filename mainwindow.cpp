@@ -9,6 +9,7 @@
 #include <QJsonValue>
 #include <QVariantList>
 #include <QVariantMap>
+#include <QFile>
 #include "contactdelegate.h"
 #include <QList>
 #include "longpollexecutor.h"
@@ -18,10 +19,10 @@ MainWindow::MainWindow(Application *app, ContactModel *contactModel, QWidget *pa
     this->application = app;
     this->contactModel = contactModel;
     ui->setupUi(this);
-    offlineIcon = new QIcon(":/contacts/resources/offline.png");
-    onlineIcon = new QIcon(":/contacts/resources/online.png");
-    loginIcon = new QIcon(":/dialog/resources/loginButton.png");
-    logoutIcon = new QIcon(":/dialog/resources/logoutButton.png");
+    loginIcon = new QIcon(":/main_window/resources/loginButton.png");
+    logoutIcon = new QIcon(":/main_window/resources/logoutButton.png");
+    contactsAllVisibleIcon = new QIcon(":/main_window/resources/allVisible.png");
+    contactsOnlineOnlyIcon = new QIcon(":/main_window/resources/onlineOnly.png");
 //    const QRect screenRect = QApplication::desktop()->rect();
 //    QRect *mainWindowRect = new QRect((screenRect.width()-260), (screenRect.height()-400), 260, 400);
 //    this->setGeometry(*mainWindowRect); /**Windows 2 screen bug**/
@@ -31,7 +32,18 @@ MainWindow::MainWindow(Application *app, ContactModel *contactModel, QWidget *pa
     ui->listView->setItemDelegate(htmlDelegate);
     connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)),this, SLOT(showDialog(QModelIndex)));
     connect(ui->authButton, SIGNAL(released()),application->getAuth(), SLOT(changeAuthStatus()));
+    contactsAllVisible = true;
+    connect(ui->contactsVisibilityButton, SIGNAL(released()), this, SLOT(switchContactsVisibility()));
     setupStatusButton();
+
+    player = new QMediaPlayer(this);
+    if (!QFile::exists(tempMessageSoundPath)) {
+        QFile::copy(messageSoundResourcePath, tempMessageSoundPath);
+        //потому что мы не можем проигрывать звук напрямую из ресурсов
+    }
+    player->setMedia(QUrl::fromLocalFile(tempMessageSoundPath));
+    player->setVolume(100);
+
 }
 
 void MainWindow::applyAuthStatus(bool isAuthComplete) {
@@ -53,25 +65,38 @@ void MainWindow::applyAuthStatus(bool isAuthComplete) {
 
 void MainWindow::applyOnlineStatus(QAction* action) {
     if (action == ui->onlineAction) {
-        ui->statusButton->setIcon(*onlineIcon);
+        ui->statusButton->setIcon(*application->getOnlineIcon());
         ui->statusButton->setText("В сети");
 
         contactModel->load();
         ui->listView->setModel(contactModel);
         ui->listView->setEnabled(true);
         application->getApiMethodExecutor()->executeMethod("account.setOnline", QMap<QString,QString>());
+        connect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)), this, SLOT(onMessage()));
         application->getLongPollExecutor()->start();
     } else {
-        ui->statusButton->setIcon(*offlineIcon);
+        ui->statusButton->setIcon(*application->getOfflineIcon());
         ui->statusButton->setText("Не в сети");
 
         application->getLongPollExecutor()->stop();
+        disconnect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)), this, SLOT(onMessage()));
         application->getApiMethodExecutor()->executeMethod("account.setOffline", QMap<QString,QString>());
         ui->listView->setEnabled(false);
         ui->listView->setModel(NULL);
         contactModel->unload();
 
     }
+}
+
+void MainWindow::onMessage() {
+    player->setPosition(0);
+    player->play();
+}
+
+void MainWindow::switchContactsVisibility() {
+    contactsAllVisible = !contactsAllVisible;
+    ui->contactsVisibilityButton->setIcon(contactsAllVisible ? *contactsAllVisibleIcon : *contactsOnlineOnlyIcon);
+     contactModel->applyContactsVisibility(contactsAllVisible);
 }
 
 
