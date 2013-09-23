@@ -6,7 +6,7 @@
 
 #DEFINES += QT_NO_DEBUG_OUTPUT
 
-QT       += core gui network webkitwidgets
+QT       += core gui network webkitwidgets multimedia
 CONFIG   += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

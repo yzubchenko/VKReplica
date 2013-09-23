@@ -23,6 +23,8 @@ MainWindow::MainWindow(Application *app, ContactModel *contactModel, QWidget *pa
     logoutIcon = new QIcon(":/main_window/resources/logoutButton.png");
     contactsAllVisibleIcon = new QIcon(":/main_window/resources/allVisible.png");
     contactsOnlineOnlyIcon = new QIcon(":/main_window/resources/onlineOnly.png");
+    soundOnIcon = new QIcon(":/main_window/resources/soundOn.png");
+    soundOffIcon = new QIcon(":/main_window/resources/soundOff.png");
 //    const QRect screenRect = QApplication::desktop()->rect();
 //    QRect *mainWindowRect = new QRect((screenRect.width()-260), (screenRect.height()-400), 260, 400);
 //    this->setGeometry(*mainWindowRect); /**Windows 2 screen bug**/
@@ -31,9 +33,11 @@ MainWindow::MainWindow(Application *app, ContactModel *contactModel, QWidget *pa
     ContactDelegate* htmlDelegate = new ContactDelegate();
     ui->listView->setItemDelegate(htmlDelegate);
     connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)),this, SLOT(showDialog(QModelIndex)));
-    connect(ui->authButton, SIGNAL(released()),application->getAuth(), SLOT(changeAuthStatus()));
+    connect(ui->authButton, SIGNAL(clicked()),application->getAuth(), SLOT(changeAuthStatus()));
     contactsAllVisible = true;
-    connect(ui->contactsVisibilityButton, SIGNAL(released()), this, SLOT(switchContactsVisibility()));
+    connect(ui->contactsVisibilityButton, SIGNAL(clicked()), this, SLOT(switchContactsVisibility()));
+    isSoundOn = true;
+    connect(ui->soundButton, SIGNAL(clicked()), this, SLOT(switchSound()));
     setupStatusButton();
 
     player = new QMediaPlayer(this);
@@ -89,14 +93,21 @@ void MainWindow::applyOnlineStatus(QAction* action) {
 }
 
 void MainWindow::onMessage() {
-    player->setPosition(0);
-    player->play();
+    if (isSoundOn) {
+        player->setPosition(0);
+        player->play();
+    }
 }
 
 void MainWindow::switchContactsVisibility() {
     contactsAllVisible = !contactsAllVisible;
     ui->contactsVisibilityButton->setIcon(contactsAllVisible ? *contactsAllVisibleIcon : *contactsOnlineOnlyIcon);
-     contactModel->applyContactsVisibility(contactsAllVisible);
+    contactModel->applyContactsVisibility(contactsAllVisible);
+}
+
+void MainWindow::switchSound() {
+    isSoundOn = !isSoundOn;
+    ui->soundButton->setIcon(isSoundOn ? *soundOnIcon : *soundOffIcon);
 }
 
 

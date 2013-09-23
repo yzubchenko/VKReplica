@@ -27,6 +27,7 @@ public slots:
     void applyOnlineStatus(QAction* action);
     void onMessage();
     void switchContactsVisibility();
+    void switchSound();
 private:
     bool isAuthComplete;
     Ui::MainWindow *ui;
@@ -38,12 +39,15 @@ private:
     QIcon* logoutIcon;
     QIcon* contactsAllVisibleIcon;
     QIcon* contactsOnlineOnlyIcon;
+    QIcon* soundOnIcon;
+    QIcon* soundOffIcon;
 
     QMediaPlayer* player;
     QString const messageSoundResourcePath = ":/sounds/resources/message.mp3";
     QString const tempMessageSoundPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/message.mp3");
     void setupStatusButton();
     bool contactsAllVisible;
+    bool isSoundOn;
 };
 
 #endif // MAINWINDOW_H

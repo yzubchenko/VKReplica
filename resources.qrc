@@ -15,5 +15,7 @@
         <file>resources/logoutButton.png</file>
         <file>resources/onlineOnly.png</file>
         <file>resources/allVisible.png</file>
+        <file>resources/soundOff.png</file>
+        <file>resources/soundOn.png</file>
     </qresource>
 </RCC>
