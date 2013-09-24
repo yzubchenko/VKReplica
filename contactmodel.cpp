@@ -42,13 +42,13 @@ ContactModel::ContactModel(Application *application, QObject *parent) : QAbstrac
     allVisible = true;
 }
 
-
-
 void ContactModel::load() {
+
     QMap<QString, QString> *map = new QMap<QString, QString>();
     map->insert("order", "hints");
     map->insert("fields","online");
     QJsonObject result = application->getApiMethodExecutor()->executeMethod("friends.get",*map);
+
     QVariantList contactJsonList = result.toVariantMap().take("response").toMap().take("items").toList();
 
     //Заполнение списка контактов и списка порядка
@@ -79,6 +79,12 @@ void ContactModel::load() {
 
     checkUnreadMessages();
 
+    sort();
+    connect(application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
+    connect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
+}
+
+void ContactModel::sort() {
     switch (sortOrder) {
         case DescRating: {
             qSort(contactList->begin(),contactList->end(),descRating);
@@ -89,8 +95,16 @@ void ContactModel::load() {
             break;
         }
     }
-    connect(application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
-    connect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
+}
+
+void ContactModel::reloadFromStorage() {
+    contactList->clear();
+    foreach (Contact* contact, *contactStorage) {
+        if (allVisible || contact->isOnline) {
+            contactList->push_back(contact);
+        }
+    }
+    sort();
 }
 
 
@@ -183,7 +197,7 @@ Contact* ContactModel::findByUserId(QString userId) {
 
 void ContactModel::applyContactsVisibility(bool allVisible) {
     this->allVisible = allVisible;
-    load();
+    reloadFromStorage();
     emit dataChanged(index(0), index(contactList->size()-1));
 }
 
@@ -192,12 +206,14 @@ void ContactModel::push(Contact* contact) {
     if (contact->hasUnreadMessage) {
         contactList->push_front(contact); //Контакты, от которых есть непрочитанные сообщения в любом случае попадают наверх
     } else if (allVisible || contact->isOnline) {
+        bool isPushed = false;
         switch(sortOrder) {
             case DescRating: {
                 foreach (Contact* sortedContact, *contactList) {
                     if (!sortedContact->hasUnreadMessage && sortedContact->rating <= contact->rating) {
                         if ((sortedContact->isOnline && contact->isOnline) || (!sortedContact->isOnline && !contact->isOnline)) {
                             contactList->insert(contactList->indexOf(sortedContact),contact);
+                            isPushed = true;
                             break;
                         }
                     }
@@ -209,11 +225,19 @@ void ContactModel::push(Contact* contact) {
                     if (sortedContact->displayName > contact->displayName) {
                         if ((sortedContact->isOnline && !sortedContact->hasUnreadMessage && contact->isOnline) || (!sortedContact->isOnline && !contact->isOnline)) {
                             contactList->insert(contactList->indexOf(sortedContact),contact);
+                            isPushed = true;
                             break;
                         }
                     }
                 }
                 break;
+            }
+        }
+        if (!isPushed) {
+            if (contact->isOnline) {
+                contactList->push_front(contact);
+            } else {
+                contactList->push_back(contact);
             }
         }
     }

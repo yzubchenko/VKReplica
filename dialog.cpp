@@ -83,6 +83,9 @@ void Dialog::insertMessage(QString messageId, bool isOutbox, bool isRead, QStrin
             QString messageHtml = prepareMessageHtml(messageId, fromId, timestamp, body, isRead);
             ui->webView->setHtml(ui->webView->page()->mainFrame()->toHtml()+messageHtml);
         }
+        if (ui->textEdit->isActiveWindow()) {
+            markInboxRead();
+        }
     }
 }
 
@@ -115,23 +118,25 @@ QString Dialog::prepareMessageHtml(QString messageId, QString fromId, uint times
 }
 
 void Dialog::markInboxRead() {
-    application->getContactModel()->acceptUnreadMessage(userId,false);
-    QString messageIds = "";
-    while (unreadInList->count()>0) {
-        QString messageId = unreadInList->takeFirst();
-        markMessageIsRead(messageId);
-        messageIds.append(messageId);
-        if (unreadInList->count()>1) {
-            messageIds.append(",");
+    if (unreadInList->count() > 0) {
+        application->getContactModel()->acceptUnreadMessage(userId,false);
+        QString messageIds = "";
+        while (unreadInList->count()>0) {
+            QString messageId = unreadInList->takeFirst();
+            markMessageIsRead(messageId);
+            messageIds.append(messageId);
+            if (unreadInList->count()>1) {
+                messageIds.append(",");
+            }
         }
-    }
-    QMap<QString,QString> params;
-    params.insert("message_ids", messageIds);
-    params.insert("user_id",this->userId);
-    QJsonObject response = application->getApiMethodExecutor()->executeMethod("messages.markAsRead",params);
+        QMap<QString,QString> params;
+        params.insert("message_ids", messageIds);
+        params.insert("user_id",this->userId);
+        QJsonObject response = application->getApiMethodExecutor()->executeMethod("messages.markAsRead",params);
 
-    if (response.toVariantMap().value("response").toString().toInt() != 1) {
-        qDebug() << "mark message as read FAILURE";
+        if (response.toVariantMap().value("response").toString().toInt() != 1) {
+            qDebug() << "mark message as read FAILURE";
+        }
     }
 }
 

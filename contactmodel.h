@@ -46,7 +46,9 @@ public:
     void push(Contact* contact);
     void refreshContact(Contact* contact);
     void load();
+    void reloadFromStorage();
     void unload();
+
 private:
     Application* application;
     QList<Contact*>* contactList;
@@ -55,6 +57,7 @@ private:
     SortOrder sortOrder = DescRating;
 
     bool allVisible;
+    void sort();
     void insert(Contact *contact, int index = -1);
     void checkUnreadMessages();
 signals:

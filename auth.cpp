@@ -9,6 +9,7 @@
 #include <QUrl>
 #include <QDebug>
 #include <QStandardPaths>
+#include <QMessageBox>
 #include "errordialog.h"
 #include <QFile>
 #include <QDir>
@@ -51,12 +52,20 @@ void Auth::showAuthDialog() {
 
 void Auth::changeAuthStatus() {
     if (webView->isHidden()) {
+
         if (isLogin) {
-            QString cookiePath = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/cookies.ini");
-            QFile file(cookiePath);
-            file.remove();
-            isLogin = false;
-            emit authStatusChanged(isLogin);
+            QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(
+                        this
+                        , "Отключение учетной записи", "Вы уверены, что хотите отключить учетную запись и\r\nстереть данные авторизации?"
+                        , QMessageBox::Yes | QMessageBox::No);
+            if (reply == QMessageBox::Yes) {
+                QString cookiePath = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/cookies.ini");
+                QFile file(cookiePath);
+                file.remove();
+                isLogin = false;
+                emit authStatusChanged(isLogin);
+            }
         } else {
             refreshWebView();
             showAuthDialog();
@@ -94,11 +103,9 @@ void Auth::handleReply(QNetworkReply *reply) {
 QMap<QString, QString>* Auth::parseReplyFragment(QString authFragment) {
     QMap<QString, QString> *replyMap = new QMap<QString, QString>();
     QStringList paramList = authFragment.split("&");
-    qDebug() << "auth params recieved:";
     foreach (QString paramStr, paramList) {
         QStringList parsedParam = paramStr.split("=");
         replyMap->insert(parsedParam[0],parsedParam[1]);
-        qDebug() << paramStr;
     }
     return replyMap;
 }

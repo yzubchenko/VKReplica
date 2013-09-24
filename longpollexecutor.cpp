@@ -23,6 +23,7 @@ LongPollExecutor::LongPollExecutor(Application *application, QObject *parent) : 
 }
 
 void LongPollExecutor::sendRequest() {
+    qDebug() << "Send longpoll request";
     QString urlStr = "http://"+server+"?act=a_check&key="+key+"&ts="+ts+"&wait=25&mode=2";
     QUrl *url = new QUrl(urlStr);
     QNetworkRequest *request = new QNetworkRequest(*url);
@@ -53,6 +54,7 @@ QList<int> LongPollExecutor::parseFlags(int flags) {
 
 void LongPollExecutor::start() {
     if (!started) {
+        qDebug() << "Longpoll exdecutor started";
         started=true;
         sendRequest();
     }
@@ -60,6 +62,7 @@ void LongPollExecutor::start() {
 }
 
 void LongPollExecutor::stop() {
+     qDebug() << "Longpoll exdecutor stopped";
      started=false;
 }
 
@@ -67,8 +70,15 @@ void LongPollExecutor::replyFinished(QNetworkReply *reply) {
     if (isStarted()) {
         QString replyJsonStr = QString::fromUtf8(reply->readAll());
         QVariantMap replyMap = QJsonDocument::fromJson(replyJsonStr.toUtf8()).object().toVariantMap();
+
+        if (!replyMap.contains("updates")) {
+            qDebug() << "Error reply:" << replyJsonStr;
+        }
+
         ts = replyMap.take("ts").toString();
-        QVariantList updates = replyMap.take("updates").toList();
+        QVariantList updates = replyMap.take("updates").toList();      
+        qDebug() << "Longpoll reply has:" << updates.size() << "updates";
+
         if (updates.size() > 0) {
             for (int idx=0; idx<updates.size(); idx++) {
                 QVariantList update = updates.value(idx).toList();

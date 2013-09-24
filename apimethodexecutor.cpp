@@ -19,7 +19,7 @@ QJsonObject ApiMethodExecutor::executeMethod(QString methodName, QMap<QString, Q
     }
     urlStr.append("v=5.1&");
     urlStr.append("access_token=").append(token);
-
+    qDebug() <<  "API method executing:" << methodName;
     QUrl *url = new QUrl(urlStr);
     QNetworkRequest *request = new QNetworkRequest(*url);
     request->setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
@@ -31,12 +31,12 @@ QJsonObject ApiMethodExecutor::executeMethod(QString methodName, QMap<QString, Q
     QByteArray buffer;
     QNetworkReply *reply = networkAccessManager->post(*request,buffer);
     QEventLoop eventLoop;
-    networkAccessManager->connect(reply,SIGNAL(finished()),&eventLoop, SLOT(quit()));
+
+    networkAccessManager->connect(reply,SIGNAL(finished()),&eventLoop, SLOT(quit()));    
     eventLoop.exec();
     QString responseJsonStr = QString::fromUtf8(reply->readAll());
-
+    reply->deleteLater();
     QJsonDocument document = QJsonDocument::fromJson(responseJsonStr.toUtf8());
-
     return document.object();
 }
 
