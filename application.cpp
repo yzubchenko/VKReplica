@@ -5,6 +5,7 @@
 #include <QDebug>
 
 #include <QApplication>
+#include <QMessageBox>
 #include <QStandardPaths>
 #include <QWidget>
 
@@ -15,7 +16,6 @@
 #include "application.h"
 #include "dialog.h"
 #include "mainwindow.h"
-#include "errordialog.h"
 
 #include <QJsonObject>
 
@@ -52,7 +52,7 @@ void Application::onAuthStatusChanged(bool isLogin) {
         apiMethodExecutor = new ApiMethodExecutor(auth->getToken(),this);
         connect(apiMethodExecutor, SIGNAL(networkStatus(bool)), this, SLOT(onNetworkStatus(bool)));
         longPollExecutor = new LongPollExecutor(this,this);
-        connect(longPollExecutor, SIGNAL(networkStatus()), this, SLOT(onNetworkStatus(bool)));
+        connect(longPollExecutor, SIGNAL(networkStatus(bool)), this, SLOT(onNetworkStatus(bool)));
         applyUser();
     } else {
         disconnect(apiMethodExecutor, SIGNAL(networkStatus(bool)), this, SLOT(onNetworkStatus(bool)));
@@ -73,9 +73,11 @@ void Application::onNetworkStatus(bool isOk) {
         if (networkErrorCounter>=maxNetworkErrorCount) {
             networkErrorCounter = 0;
             mainWindow->applyOnlineStatus(false);
-            ErrorDialog *errorDialog = new ErrorDialog("Не удается установить соединение с сервером. Проверьте состояние сети.");
-            errorDialog->connect(errorDialog, SIGNAL(finished(int)), errorDialog, SLOT(deleteLater()));
-            errorDialog->show();
+            QMessageBox::critical(
+                        mainWindow
+                        , "Ошибка подключения"
+                        , "Не удается установить соединение с сервером. Проверьте состояние сети."
+                        , QMessageBox::Ok);
         }
     }
 }

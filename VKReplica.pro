@@ -22,7 +22,6 @@ SOURCES += main.cpp\
     application.cpp \
     connection/cookiejar.cpp \
     connection/autosaver.cpp \
-    errordialog.cpp \
     apimethodexecutor.cpp \
     contactmodel.cpp \
     longpollexecutor.cpp \
@@ -37,7 +36,6 @@ HEADERS  += mainwindow.h \
     application.h \
     connection/autosaver.h \
     connection/cookiejar.h \
-    errordialog.h \
     apimethodexecutor.h \
     contactmodel.h \
     contactdelegate.h \
@@ -47,7 +45,6 @@ HEADERS  += mainwindow.h \
     focustextedit.h
 
 FORMS    += mainwindow.ui \
-    errordialog.ui \
     dialogmanager.ui \
     dialog.ui
 
