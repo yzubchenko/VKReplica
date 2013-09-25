@@ -17,5 +17,7 @@
         <file>resources/allVisible.png</file>
         <file>resources/soundOff.png</file>
         <file>resources/soundOn.png</file>
+        <file>resources/sortName.png</file>
+        <file>resources/sortRate.png</file>
     </qresource>
 </RCC>
