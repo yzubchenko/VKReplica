@@ -19,6 +19,7 @@ QJsonObject ApiMethodExecutor::executeMethod(QString methodName, QMap<QString, Q
         urlStr.append(paramName).append("=").append(params.value(paramName)).append("&");
     }
     urlStr.append("v=5.1&");
+    urlStr.append("https=1&");
     urlStr.append("access_token=").append(token);
     qDebug() <<  "API method executing:" << methodName;
     QUrl *url = new QUrl(urlStr);

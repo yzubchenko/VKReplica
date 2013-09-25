@@ -15,6 +15,7 @@
 #include "application.h"
 #include "dialog.h"
 #include "mainwindow.h"
+#include "errordialog.h"
 
 #include <QJsonObject>
 
