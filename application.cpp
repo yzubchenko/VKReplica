@@ -19,6 +19,8 @@
 #include <QJsonObject>
 
 Application::Application(QObject *parent) : QObject(parent) {
+    networkErrorCounter = 0;
+    maxNetworkErrorCount = 50;
 }
 
 
@@ -47,15 +49,34 @@ void Application::applyUser() {
 void Application::onAuthStatusChanged(bool isLogin) {
     if (isLogin) {
         apiMethodExecutor = new ApiMethodExecutor(auth->getToken(),this);
+        connect(apiMethodExecutor, SIGNAL(networkStatus(bool)), this, SLOT(onNetworkStatus(bool)));
         longPollExecutor = new LongPollExecutor(this,this);
+        connect(longPollExecutor, SIGNAL(networkStatus()), this, SLOT(onNetworkStatus(bool)));
         applyUser();
     } else {
+        disconnect(apiMethodExecutor, SIGNAL(networkStatus(bool)), this, SLOT(onNetworkStatus(bool)));
         apiMethodExecutor->deleteLater();
+        disconnect(longPollExecutor, SIGNAL(networkStatus(bool)), this, SLOT(onNetworkStatus(bool)));
         longPollExecutor->deleteLater();
-        userDisplayName = QString();
-        userId = QString();
+        userDisplayName.clear();
+        userId.clear();
     }
     mainWindow->applyAuthStatus(isLogin);
+}
+
+void Application::onNetworkStatus(bool isOk) {
+    if (isOk) {
+        networkErrorCounter = 0;
+    } else {
+        networkErrorCounter++;
+        if (networkErrorCounter>=maxNetworkErrorCount) {
+            networkErrorCounter = 0;
+            mainWindow->applyOnlineStatus(false);
+            ErrorDialog *errorDialog = new ErrorDialog("Не удается установить соединение с сервером. Проверьте состояние сети.");
+            errorDialog->connect(errorDialog, SIGNAL(finished(int)), errorDialog, SLOT(deleteLater()));
+            errorDialog->show();
+        }
+    }
 }
 
 Application::~Application() {

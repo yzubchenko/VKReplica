@@ -15,10 +15,12 @@ public:
     explicit ApiMethodExecutor(QString token, QObject *parent = 0);
     QJsonObject executeMethod(QString methodName, QMap<QString,QString> params);
     ~ApiMethodExecutor();
-
+signals:
+    void networkStatus(bool isOk);
 private:
     CustomNetworkAccessManager *networkAccessManager;
     QString token;
+    volatile unsigned int timeoutCounter;
 };
 #endif // APIMETHODEXECUTOR_H
 

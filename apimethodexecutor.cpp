@@ -9,6 +9,7 @@
 
 ApiMethodExecutor::ApiMethodExecutor(QString token, QObject *parent) : QObject(parent) {
     this->token = token;
+    timeoutCounter = 0;
     networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone);
 }
 
@@ -34,10 +35,17 @@ QJsonObject ApiMethodExecutor::executeMethod(QString methodName, QMap<QString, Q
 
     networkAccessManager->connect(reply,SIGNAL(finished()),&eventLoop, SLOT(quit()));    
     eventLoop.exec();
-    QString responseJsonStr = QString::fromUtf8(reply->readAll());
     reply->deleteLater();
-    QJsonDocument document = QJsonDocument::fromJson(responseJsonStr.toUtf8());
-    return document.object();
+    if (reply->error() == QNetworkReply::NoError) {
+        QString responseJsonStr = QString::fromUtf8(reply->readAll());
+        QJsonDocument document = QJsonDocument::fromJson(responseJsonStr.toUtf8());
+        emit networkStatus(true);
+        return document.object();
+    } else {
+        qDebug() << "API Method execute: Network Error:" << reply->errorString();
+        emit networkStatus(false);
+        return executeMethod(methodName,params);
+    }
 }
 
 ApiMethodExecutor::~ApiMethodExecutor() {

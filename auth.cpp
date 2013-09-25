@@ -75,6 +75,12 @@ void Auth::changeAuthStatus() {
     }
 }
 
+void Auth::showErrorDialog(QString message) {
+    ErrorDialog *errorDialog = new ErrorDialog(message);
+    errorDialog->connect(errorDialog, SIGNAL(finished(int)), errorDialog, SLOT(deleteLater()));
+    errorDialog->show();
+}
+
 /*Обработчик ответа на запрос авторизации*/
 void Auth::handleReply(QNetworkReply *reply) {
     if (reply->error() == QNetworkReply::NoError) {
@@ -83,9 +89,7 @@ void Auth::handleReply(QNetworkReply *reply) {
             QMap<QString, QString>* parsedReply = this->parseReplyFragment(reply->url().fragment());
             webView->hide();
             if (parsedReply->contains("error")) {
-                ErrorDialog *errorDialog = new ErrorDialog(parsedReply->take("error_description"));
-                errorDialog->connect(errorDialog, SIGNAL(finished(int)), this, SLOT(showAuthDialog()));
-                errorDialog->show();
+                showErrorDialog(parsedReply->take("error_description"));
             } else {
                 token = parsedReply->take("access_token");
                 userId = parsedReply->take("user_id");
@@ -95,6 +99,10 @@ void Auth::handleReply(QNetworkReply *reply) {
                 emit authStatusChanged(isLogin);
             }
         }
+    } else {
+        webView->hide();
+        showErrorDialog("Не удается установить соединение с сервером. Проверьте состояние сети.");
+        qDebug() << reply->errorString();
     }
     reply->deleteLater();
 }

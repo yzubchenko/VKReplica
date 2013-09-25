@@ -19,12 +19,14 @@ MainWindow::MainWindow(Application *app, ContactModel *contactModel, QWidget *pa
     this->application = app;
     this->contactModel = contactModel;
     ui->setupUi(this);
+    isOnline = false;
     loginIcon = new QIcon(":/main_window/resources/loginButton.png");
     logoutIcon = new QIcon(":/main_window/resources/logoutButton.png");
     contactsAllVisibleIcon = new QIcon(":/main_window/resources/allVisible.png");
     contactsOnlineOnlyIcon = new QIcon(":/main_window/resources/onlineOnly.png");
     soundOnIcon = new QIcon(":/main_window/resources/soundOn.png");
     soundOffIcon = new QIcon(":/main_window/resources/soundOff.png");
+
 //    const QRect screenRect = QApplication::desktop()->rect();
 //    QRect *mainWindowRect = new QRect((screenRect.width()-260), (screenRect.height()-400), 260, 400);
 //    this->setGeometry(*mainWindowRect); /**Windows 2 screen bug**/
@@ -69,27 +71,37 @@ void MainWindow::applyAuthStatus(bool isAuthComplete) {
 
 void MainWindow::applyOnlineStatus(QAction* action) {
     if (action == ui->onlineAction) {
-        ui->statusButton->setIcon(*application->getOnlineIcon());
-        ui->statusButton->setText("В сети");
+        if (!isOnline){
+            ui->statusButton->setIcon(*application->getOnlineIcon());
+            ui->statusButton->setText("В сети");
 
-        contactModel->load();
-        ui->listView->setModel(contactModel);
-        ui->listView->setEnabled(true);
-        application->getApiMethodExecutor()->executeMethod("account.setOnline", QMap<QString,QString>());
-        connect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)), this, SLOT(onMessage()));
-        application->getLongPollExecutor()->start();
+            contactModel->load();
+            ui->listView->setModel(contactModel);
+            ui->listView->setEnabled(true);
+            application->getApiMethodExecutor()->executeMethod("account.setOnline", QMap<QString,QString>());
+            connect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)), this, SLOT(onMessage()));
+            application->getLongPollExecutor()->start();
+            isOnline = true;
+        }
     } else {
-        ui->statusButton->setIcon(*application->getOfflineIcon());
-        ui->statusButton->setText("Не в сети");
+        if (isOnline) {
+            isOnline = false;
+            ui->statusButton->setIcon(*application->getOfflineIcon());
+            ui->statusButton->setText("Не в сети");
 
-        application->getLongPollExecutor()->stop();
-        disconnect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)), this, SLOT(onMessage()));
-        application->getApiMethodExecutor()->executeMethod("account.setOffline", QMap<QString,QString>());
-        ui->listView->setEnabled(false);
-        ui->listView->setModel(NULL);
-        contactModel->unload();
+            application->getLongPollExecutor()->stop();
+            disconnect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)), this, SLOT(onMessage()));
+            //application->getApiMethodExecutor()->executeMethod("account.setOffline", QMap<QString,QString>());
+            ui->listView->setEnabled(false);
+            ui->listView->setModel(NULL);
+            contactModel->unload();
+        }
 
     }
+}
+
+void MainWindow::applyOnlineStatus(bool isOnline) {
+    applyOnlineStatus(isOnline ? ui->onlineAction : ui->offlineAction);
 }
 
 void MainWindow::onMessage() {

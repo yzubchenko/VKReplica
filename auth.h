@@ -22,6 +22,7 @@ private:
     QMap<QString, QString>* parseReplyFragment(QString authFragment);
     void refreshWebView();
     void calculateWebViewGeometry();
+    void showErrorDialog(QString message);
 public:
     explicit Auth(QWidget *parent = 0);
 
@@ -33,6 +34,7 @@ public:
 
 
     ~Auth();
+
 
 signals:
     void authStatusChanged(bool isLogin);

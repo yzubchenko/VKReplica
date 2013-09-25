@@ -25,6 +25,7 @@ public:
 public slots:
     void showDialog(QModelIndex modelIndex);
     void applyOnlineStatus(QAction* action);
+    void applyOnlineStatus(bool isOnline);
     void onMessage();
     void switchContactsVisibility();
     void switchSound();
@@ -48,6 +49,7 @@ private:
     void setupStatusButton();
     bool contactsAllVisible;
     bool isSoundOn;
+    volatile bool isOnline;
 };
 
 #endif // MAINWINDOW_H

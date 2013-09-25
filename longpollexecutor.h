@@ -54,6 +54,7 @@ signals:
     void messageRecieved(QString fromId, bool isUnread);
     void messageRecieved(QString messageId, bool isOutBox, bool isRead, QString userId, uint timestamp, QString body);
     void contactIsOnline(QString userId, bool isOnline);
+    void networkStatus(bool isOk);
 public slots:
     void replyFinished(QNetworkReply* reply);
 

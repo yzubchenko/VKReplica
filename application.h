@@ -37,13 +37,16 @@ private:
     MainWindow *mainWindow;
     QIcon *offlineIcon = new QIcon(":/contacts/resources/offline.png");
     QIcon *onlineIcon = new QIcon(":/contacts/resources/online.png");
-
     void applyUser();
+
+    volatile unsigned int networkErrorCounter;
+    int maxNetworkErrorCount;
 
 signals:
 
 private slots:
     void onAuthStatusChanged(bool isLogin);
+    void onNetworkStatus(bool isOk);
 };
 
 #endif // APPLICATION_H
