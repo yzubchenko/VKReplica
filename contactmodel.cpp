@@ -205,18 +205,25 @@ void ContactModel::applyContactsVisibility(bool allVisible) {
 void ContactModel::push(Contact* contact) {
     if (contact->hasUnreadMessage) {
         contactList->push_front(contact); //Контакты, от которых есть непрочитанные сообщения в любом случае попадают наверх
+        return;
     } else if (allVisible || contact->isOnline) {
-        bool isPushed = false;
+        Contact* lastOnline;
+        Contact* lastOffline;
         switch(sortOrder) {
             case DescRating: {
                 foreach (Contact* sortedContact, *contactList) {
                     if (!sortedContact->hasUnreadMessage && sortedContact->rating <= contact->rating) {
                         if ((sortedContact->isOnline && contact->isOnline) || (!sortedContact->isOnline && !contact->isOnline)) {
                             contactList->insert(contactList->indexOf(sortedContact),contact);
-                            isPushed = true;
-                            break;
+                            return;
                         }
                     }
+                    if (sortedContact->isOnline) {
+                        lastOnline = sortedContact;
+                    } else {
+                        lastOffline = sortedContact;
+                    }
+
                 }
                 break;
             }
@@ -225,20 +232,23 @@ void ContactModel::push(Contact* contact) {
                     if (sortedContact->displayName > contact->displayName) {
                         if ((sortedContact->isOnline && !sortedContact->hasUnreadMessage && contact->isOnline) || (!sortedContact->isOnline && !contact->isOnline)) {
                             contactList->insert(contactList->indexOf(sortedContact),contact);
-                            isPushed = true;
-                            break;
+                            return;
                         }
+                    }
+                    if (sortedContact->isOnline) {
+                        lastOnline = sortedContact;
+                    } else {
+                        lastOffline = sortedContact;
                     }
                 }
                 break;
             }
         }
-        if (!isPushed) {
-            if (contact->isOnline) {
-                contactList->push_front(contact);
-            } else {
-                contactList->push_back(contact);
-            }
+        //Добавляем контакт в конец списка, если так никуда и не добавились ранее
+        if (contact->isOnline) {
+            contactList->insert(contactList->indexOf(lastOnline)+1,contact);
+        } else {
+            contactList->insert(contactList->indexOf(lastOffline)+1,contact);
         }
     }
 }
