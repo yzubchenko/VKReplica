@@ -6,24 +6,29 @@
 
 class Application;
 
-class LongPollExecutor : public QObject
-{
+class LongPollExecutor : public QObject {
     Q_OBJECT
 public:
-    explicit LongPollExecutor(Application *application, QObject *parent = 0);
+    explicit LongPollExecutor(const Application *application, QObject *parent = 0);
     void start();
     void stop();
-    bool isStarted() const {return started;}
-
+    const bool& isStarted() const {return started;}
+public slots:
+    void replyFinished(QNetworkReply* reply);
+signals:
+    void messageRemoved(QString messageId);
+    void messageIsRead(QString messageId);
+    void messageRecieved(QString fromId, bool isUnread);
+    void messageRecieved(QString messageId, bool isOutBox, bool isRead, QString userId, uint timestamp, QString body);
+    void contactIsOnline(QString userId, bool isOnline);
+    void networkStatus(bool isOk);
 private:
-    Application *application;
-    QNetworkAccessManager *networkAccessManager;
+    const Application* application;
+    QNetworkAccessManager* networkAccessManager;
     QString server;
     QString key;
     QString ts;
     bool started = false;
-
-    void sendRequest();
 
     const uint F_UNREAD = 1;
     const uint F_OUTBOX = 2;
@@ -35,9 +40,14 @@ private:
     const uint F_DELETED = 128;
     const uint F_FIXED = 256;
     const uint F_MEDIA = 512;
-    QList<int> parseFlags(int flags);
-signals:
-    /*0,$message_id,0 -- удаление сообщения с указанным local_id
+
+    void sendRequest() const;
+    QList<int> parseFlags(int flags) const;
+};
+
+#endif // LONGPOLLEXECUTOR_H
+
+/*0,$message_id,0 -- удаление сообщения с указанным local_id
 1,$message_id,$flags -- замена флагов сообщения (FLAGS:=$flags)
 2,$message_id,$mask[,$user_id] -- установка флагов сообщения (FLAGS|=$mask)
 3,$message_id,$mask[,$user_id] -- сброс флагов сообщения (FLAGS&=~$mask)
@@ -49,15 +59,3 @@ signals:
 61,$user_id,$flags -- пользователь $user_id начал набирать текст в диалоге. событие должно приходить раз в ~5 секунд при постоянном наборе текста. $flags = 1
 62,$user_id,$chat_id -- пользователь $user_id начал набирать текст в беседе $chat_id.
 70,$user_id,$call_id -- пользователь $user_id совершил звонок имеющий идентификатор $call_id, дополнительную информацию о звонке можно получить используя метод voip.getCallInfo.*/
-    void messageRemoved(QString messageId);
-    void messageIsRead(QString messageId);
-    void messageRecieved(QString fromId, bool isUnread);
-    void messageRecieved(QString messageId, bool isOutBox, bool isRead, QString userId, uint timestamp, QString body);
-    void contactIsOnline(QString userId, bool isOnline);
-    void networkStatus(bool isOk);
-public slots:
-    void replyFinished(QNetworkReply* reply);
-
-};
-
-#endif // LONGPOLLEXECUTOR_H

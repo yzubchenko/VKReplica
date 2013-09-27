@@ -6,8 +6,7 @@
 #include <QNetworkRequest>
 #include <QSsl>
 
-class CustomNetworkAccessManager : public QNetworkAccessManager
-{
+class CustomNetworkAccessManager : public QNetworkAccessManager {
     Q_OBJECT
 private:
     QSsl::SslProtocol protocol;
@@ -16,7 +15,7 @@ public:
     CustomNetworkAccessManager (QSsl::SslProtocol protocol, QSslSocket::PeerVerifyMode mode);
 
 protected:
-    QNetworkReply * createRequest ( Operation op, const QNetworkRequest & req, QIODevice * outgoingData = 0 );
+    QNetworkReply* createRequest(Operation op, const QNetworkRequest& req, QIODevice* outgoingData = 0);
 };
 
 #endif // CUSTOMNETWORKACCESSMANAGER_H

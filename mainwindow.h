@@ -14,39 +14,37 @@ class Application;
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
-
 public:
-    explicit MainWindow(Application *app, ContactModel *contactModel, QWidget *parent = 0);
+    explicit MainWindow(const Application* application, ContactModel* contactModel, QWidget* parent = 0);
     ~MainWindow();
-    void applyAuthStatus(bool isAuthComplete);
+    void applyAuthStatus(const bool& isAuthComplete);
 public slots:
-    void showDialog(QModelIndex modelIndex);
+    void showDialog(const QModelIndex& modelIndex) const;
     void applyOnlineStatus(QAction* action);
     void applyOnlineStatus(bool isOnline);
-    void onMessage();
+    void onMessage() const;
     void switchContactsVisibility();
     void switchSound();
 private:
     bool isAuthComplete;
     Ui::MainWindow *ui;
-    Application *application;
+    const Application *application;
     ContactModel *contactModel;
     DialogManager *dialogManager;
 
-    QIcon* loginIcon;
-    QIcon* logoutIcon;
-    QIcon* contactsAllVisibleIcon;
-    QIcon* contactsOnlineOnlyIcon;
-    QIcon* soundOnIcon;
-    QIcon* soundOffIcon;
+    const QIcon loginIcon = QIcon(":/main_window/resources/loginButton.png");
+    const QIcon logoutIcon = QIcon(":/main_window/resources/logoutButton.png");
+    const QIcon contactsAllVisibleIcon = QIcon(":/main_window/resources/allVisible.png");
+    const QIcon contactsOnlineOnlyIcon = QIcon(":/main_window/resources/onlineOnly.png");
+    const QIcon soundOnIcon = QIcon(":/main_window/resources/soundOn.png");
+    const QIcon soundOffIcon = QIcon(":/main_window/resources/soundOff.png");
 
     QMediaPlayer* player;
-    QString const messageSoundResourcePath = ":/sounds/resources/message.mp3";
-    QString const tempMessageSoundPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/message.mp3");
-    void setupStatusButton();
+    const QString messageSoundResourcePath = ":/sounds/resources/message.mp3";
+    const QString tempMessageSoundPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/message.mp3");
+    void setupStatusButton() const;
     bool contactsAllVisible;
     bool isSoundOn;
     volatile bool isOnline;

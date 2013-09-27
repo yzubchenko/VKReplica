@@ -37,23 +37,22 @@ bool descRating(const Contact* c1 , const Contact* c2 ) {
 
 }
 
-ContactModel::ContactModel(Application *application, QObject *parent) : QAbstractListModel(parent) {
+ContactModel::ContactModel(const Application* application, QObject* parent) : QAbstractListModel(parent) {
     this->application = application;
     allVisible = true;
 }
 
 void ContactModel::load() {
-
-    QMap<QString, QString> *map = new QMap<QString, QString>();
-    map->insert("order", "hints");
-    map->insert("fields","online");
-    QJsonObject result = application->getApiMethodExecutor()->executeMethod("friends.get",*map);
+    QMap<QString, QString> map = QMap<QString, QString>();
+    map.insert("order", "hints");
+    map.insert("fields","online");
+    QJsonObject result = application->getApiMethodExecutor().executeMethod("friends.get", map);
 
     QVariantList contactJsonList = result.toVariantMap().take("response").toMap().take("items").toList();
 
     //Заполнение списка контактов и списка порядка
-    this->contactList = new QList<Contact*>();
-    this->contactStorage = new QList<Contact*>();
+    contactList = QList<Contact*>();
+    contactStorage = QList<Contact*>();
     int rating = contactJsonList.size();
     foreach (QVariant value,contactJsonList) {
         QMap<QString, QVariant> valueMap = value.toMap();
@@ -69,39 +68,39 @@ void ContactModel::load() {
                 .append(" ")
                 .append(valueMap.value("last_name").toString());
 
-        Contact *contact = new Contact{userId,rating,displayName,isOnline,false};
+        Contact* contact = new Contact{userId,rating,displayName,isOnline,false};
         rating--;
-        contactStorage->push_back(contact);
+        contactStorage.push_back(contact);
         if (allVisible || isOnline) {
-           contactList->push_back(contact);
+           contactList.push_back(contact);
         }
     }
 
     checkUnreadMessages();
 
     sort();
-    connect(application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
-    connect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
+    connect(&application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
+    connect(&application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
 }
 
 void ContactModel::sort() {
     switch (sortOrder) {
         case DescRating: {
-            qSort(contactList->begin(),contactList->end(),descRating);
+            qSort(contactList.begin(),contactList.end(),descRating);
             break;
         }
         case AscDisplayName:{
-            qSort(contactList->begin(),contactList->end(),ascDisplayName);
+            qSort(contactList.begin(),contactList.end(),ascDisplayName);
             break;
         }
     }
 }
 
 void ContactModel::reloadFromStorage() {
-    contactList->clear();
-    foreach (Contact* contact, *contactStorage) {
+    contactList.clear();
+    foreach (Contact* contact, contactStorage) {
         if (allVisible || contact->isOnline) {
-            contactList->push_back(contact);
+            contactList.push_back(contact);
         }
     }
     sort();
@@ -110,36 +109,39 @@ void ContactModel::reloadFromStorage() {
 
 /*Запрос контактов по API*/
 void ContactModel::unload() {
-    contactList->clear();
-    disconnect(application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
-    disconnect(application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
+    contactList.clear();
+    disconnect(&application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
+    disconnect(&application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
 }
 
-void ContactModel::checkUnreadMessages() {
+void ContactModel::checkUnreadMessages() const {
     QMap<QString,QString> params;
     params.insert("filters","1");
-    QJsonObject result = application->getApiMethodExecutor()->executeMethod("messages.get",params);
+    QJsonObject result = application->getApiMethodExecutor().executeMethod("messages.get",params);
 
     QVariantList unreadMessageList = result.toVariantMap().take("response").toMap().take("items").toList();
     foreach (QVariant unreadMessage, unreadMessageList) {
         QString userId = unreadMessage.toMap().value("user_id").toString();
-        findByUserId(userId)->hasUnreadMessage = true;
+        Contact* contact = findByUserId(userId);
+        if (contact != nullptr) {
+            contact->hasUnreadMessage = true;
+        }
     }
 }
 
-int ContactModel::rowCount(const QModelIndex &parent) const {
+int ContactModel::rowCount(const QModelIndex& parent) const {
     if (parent.isValid()) {
         return 0;
     }
-    return contactList->count();
+    return contactList.count();
 }
 
-QVariant ContactModel::data(const QModelIndex &index, int role) const {
-    if (index.row() < 0 || index.row() >= contactList->size()) {
+QVariant ContactModel::data(const QModelIndex& index, int role) const {
+    if (index.row() < 0 || index.row() >= contactList.size()) {
         return QVariant();
     }
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
-        Contact *contact = contactList->at(index.row());
+        Contact* contact = contactList.at(index.row());
         QVariant contactVariant;
         contactVariant.setValue(contact);
         return contactVariant;
@@ -154,8 +156,8 @@ bool ContactModel::insertRows(int row, int count, const QModelIndex &parent) {
     }
     beginInsertRows(QModelIndex(), row, row + count - 1);
     for (int r = 0; r < count; ++r) {
-        Contact *emptyContact = new Contact();
-        contactList->insert(row, emptyContact);
+        Contact* emptyContact = new Contact();
+        contactList.insert(row, emptyContact);
     }
     endInsertRows();
     return true;
@@ -167,54 +169,50 @@ bool ContactModel::removeRows(int row, int count, const QModelIndex &parent) {
     }
     beginRemoveRows(QModelIndex(), row, row + count - 1);
     for (int r = 0; r < count; ++r) {
-        contactList->removeAt(row);
+        contactList.removeAt(row);
     }
     endRemoveRows();
     return true;
 }
 
-QList<Contact*>* ContactModel::getAll() const {
-    return contactList;
-}
-
-Contact *ContactModel::getByRow(int row) {
-    if (row<0 || row>=contactList->size()) {
+Contact* ContactModel::getByRow(int row) const {
+    if (row<0 || row>=contactList.size()) {
         return NULL;
     }
-    return contactList->at(row);
+    return contactList.at(row);
 }
 
-Contact* ContactModel::findByUserId(QString userId) {
-    foreach (Contact* contact, *contactStorage) {
+Contact* ContactModel::findByUserId(const QString& userId) const {
+    foreach (Contact* contact, contactStorage) {
         if (contact->userId == userId) {
             return contact;
         }
     }
     //        TODO Если контакт не найден, попробовать сделать запрос по API,
     //        и только если там не найдется, выходить из метода
-    return NULL;
+    return nullptr;
 }
 
-void ContactModel::applyContactsVisibility(bool allVisible) {
+void ContactModel::applyContactsVisibility(const bool allVisible) {
     this->allVisible = allVisible;
     reloadFromStorage();
-    emit dataChanged(index(0), index(contactList->size()-1));
+    emit dataChanged(index(0), index(contactList.size()-1));
 }
 
 
 void ContactModel::push(Contact* contact) {
     if (contact->hasUnreadMessage) {
-        contactList->push_front(contact); //Контакты, от которых есть непрочитанные сообщения в любом случае попадают наверх
+        contactList.push_front(contact); //Контакты, от которых есть непрочитанные сообщения в любом случае попадают наверх
         return;
     } else if (allVisible || contact->isOnline) {
         Contact* lastOnline;
         Contact* lastOffline;
         switch(sortOrder) {
             case DescRating: {
-                foreach (Contact* sortedContact, *contactList) {
+                foreach (Contact* sortedContact, contactList) {
                     if (!sortedContact->hasUnreadMessage && sortedContact->rating <= contact->rating) {
                         if ((sortedContact->isOnline && contact->isOnline) || (!sortedContact->isOnline && !contact->isOnline)) {
-                            contactList->insert(contactList->indexOf(sortedContact),contact);
+                            contactList.insert(contactList.indexOf(sortedContact),contact);
                             return;
                         }
                     }
@@ -228,10 +226,10 @@ void ContactModel::push(Contact* contact) {
                 break;
             }
             case AscDisplayName: {
-                foreach (Contact* sortedContact, *contactList) {
+                foreach (Contact* sortedContact, contactList) {
                     if (sortedContact->displayName > contact->displayName) {
                         if ((sortedContact->isOnline && !sortedContact->hasUnreadMessage && contact->isOnline) || (!sortedContact->isOnline && !contact->isOnline)) {
-                            contactList->insert(contactList->indexOf(sortedContact),contact);
+                            contactList.insert(contactList.indexOf(sortedContact),contact);
                             return;
                         }
                     }
@@ -246,9 +244,9 @@ void ContactModel::push(Contact* contact) {
         }
         //Добавляем контакт в конец списка, если так никуда и не добавились ранее
         if (contact->isOnline) {
-            contactList->insert(contactList->indexOf(lastOnline)+1,contact);
+            contactList.insert(contactList.indexOf(lastOnline)+1,contact);
         } else {
-            contactList->insert(contactList->indexOf(lastOffline)+1,contact);
+            contactList.insert(contactList.indexOf(lastOffline)+1,contact);
         }
     }
 }
@@ -257,23 +255,23 @@ void ContactModel::insert(Contact* contact, int idx) {
     if (idx < 0) {
         push(contact);
     } else {
-        contactList->insert(idx,contact);
+        contactList.insert(idx,contact);
     }
-    emit dataChanged(index(0), index(contactList->size()-1));
+    emit dataChanged(index(0), index(contactList.size()-1));
 }
 
 void ContactModel::refreshContact(Contact* contact) {
-    if (contactList->contains(contact)) {
-        contactList->removeAt(contactList->indexOf(contact));
+    if (contactList.contains(contact)) {
+        contactList.removeAt(contactList.indexOf(contact));
     }
     this->push(contact);
 
-    emit dataChanged(index(0), index(contactList->size()-1));
+    emit dataChanged(index(0), index(contactList.size()-1));
 }
 
-void ContactModel::setContactOnline(QString userId, bool isOnline) {
+void ContactModel::setContactOnline(QString userId, bool isOnline){
     Contact* contact = findByUserId(userId);
-    if (contact == NULL) {
+    if (contact == nullptr) {
         return;
     }
 
@@ -285,7 +283,7 @@ void ContactModel::setContactOnline(QString userId, bool isOnline) {
 
 void ContactModel::acceptUnreadMessage(QString userId, bool hasUnread) {
     Contact* contact = findByUserId(userId);
-    if (contact == NULL) {
+    if (contact == nullptr) {
         return;
     }
     if (contact->hasUnreadMessage != hasUnread) {

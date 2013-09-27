@@ -15,8 +15,8 @@
 #include <connection/cookiejar.h>
 
 /*Конструктор*/
-Auth::Auth(QWidget *parent) : QWidget(parent) {
-    url = new QUrl("https://oauth.vk.com/authorize?client_id=3860301&scope=friends,audio,status,messages&redirect_uri=https://oauth.vk.com/blank.html&display=page&v=5.0&response_type=token");
+Auth::Auth(QWidget* parent) : QWidget(parent) {
+    url = QUrl("https://oauth.vk.com/authorize?client_id=3860301&scope=friends,audio,status,messages&redirect_uri=https://oauth.vk.com/blank.html&display=page&v=5.0&response_type=token");
     webView = new QWebView(parent);
     webView->setWindowTitle("VK Replica - Авторизация");
     Qt::WindowFlags flags = Qt::Window | Qt::WindowCloseButtonHint;
@@ -27,25 +27,24 @@ Auth::Auth(QWidget *parent) : QWidget(parent) {
 }
 
 /*Расчет геометрии окна авторизации*/
-void Auth::calculateWebViewGeometry() {
+void Auth::calculateWebViewGeometry() const {
     //const QRect screenRect = QApplication::desktop()->rect();
     //QRect *webViewRect = new QRect(screenRect.width()/2-304, screenRect.height()/2-157,607,314);
    // webView->setGeometry(*webViewRect); /**Windows 2 screen bug**/
     webView->setFixedSize(QSize(607,314));
 }
 
-void Auth::refreshWebView() {
+void Auth::refreshWebView() const {
     webView->setHtml("");
-    CustomNetworkAccessManager *networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone);
+    CustomNetworkAccessManager* networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone);
     networkAccessManager->connect(networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleReply(QNetworkReply*)));
     webView->page()->setNetworkAccessManager(networkAccessManager);
 }
 
 /*Отображает окно логина*/
-void Auth::showAuthDialog() {  
+void Auth::showAuthDialog() const {
     qDebug() << "request auth";
-
-    webView->load(*url);
+    webView->load(url);
     webView->show();
 }
 
@@ -75,22 +74,22 @@ void Auth::changeAuthStatus() {
 }
 
 /*Обработчик ответа на запрос авторизации*/
-void Auth::handleReply(QNetworkReply *reply) {
+void Auth::handleReply(QNetworkReply* reply) {
     if (reply->error() == QNetworkReply::NoError) {
         QString url = reply->url().url(QUrl::RemoveFragment);
         if (url == "https://oauth.vk.com/blank.html") {
-            QMap<QString, QString>* parsedReply = this->parseReplyFragment(reply->url().fragment());
+            QMap<QString, QString> parsedReply = this->parseReplyFragment(reply->url().fragment());
             webView->hide();
-            if (parsedReply->contains("error")) {
+            if (parsedReply.contains("error")) {
                 QMessageBox::critical(
                             this
                             , "Ошибка"
-                            , parsedReply->take("error_description")
+                            , parsedReply.take("error_description")
                             , QMessageBox::Ok);
             } else {
-                token = parsedReply->take("access_token");
-                userId = parsedReply->take("user_id");
-                expiresIn = parsedReply->take("expires_in");
+                token = parsedReply.take("access_token");
+                userId = parsedReply.take("user_id");
+                expiresIn = parsedReply.take("expires_in");
                 qDebug() << "auth complete\r\n";
                 isLogin = true;
                 emit authStatusChanged(isLogin);
@@ -109,12 +108,12 @@ void Auth::handleReply(QNetworkReply *reply) {
 }
 
 /*Парсит ответ на запрос авторизации*/
-QMap<QString, QString>* Auth::parseReplyFragment(QString authFragment) {
-    QMap<QString, QString> *replyMap = new QMap<QString, QString>();
+QMap<QString, QString> Auth::parseReplyFragment(const QString authFragment) const {
+    QMap<QString, QString> replyMap = QMap<QString, QString>();
     QStringList paramList = authFragment.split("&");
     foreach (QString paramStr, paramList) {
         QStringList parsedParam = paramStr.split("=");
-        replyMap->insert(parsedParam[0],parsedParam[1]);
+        replyMap.insert(parsedParam[0],parsedParam[1]);
     }
     return replyMap;
 }

@@ -1,5 +1,5 @@
-#ifndef CONTACTS_H
-#define CONTACTS_H
+#ifndef CONTACTMODEL_H
+#define CONTACTMODEL_H
 
 #include <QObject>
 #include <QList>
@@ -17,8 +17,7 @@ struct Contact {
 
 Q_DECLARE_METATYPE(Contact *)
 
-class ContactModel : public QAbstractListModel
-{
+class ContactModel : public QAbstractListModel {
     Q_OBJECT
 public:
     enum SortOrder {
@@ -26,21 +25,16 @@ public:
         AscDisplayName
     };
 
+    explicit ContactModel(const Application* application, QObject *parent = 0);
 
-    explicit ContactModel(Application *application, QObject *parent = 0);
-
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-
-    QVariant data(const QModelIndex &index, int role) const;
-
+    int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    QVariant data(const QModelIndex& index, int role) const;
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
-
-    QList<Contact*>* getAll() const;
-    Contact* getByRow(int row);
-    Contact* findByUserId(QString userId);
-    void applyContactsVisibility(bool allVisible);
+    Contact* getByRow(int row) const;
+    Contact* findByUserId(const QString& userId) const;
+    void applyContactsVisibility(const bool allVisible);
 
 
     void push(Contact* contact);
@@ -49,22 +43,25 @@ public:
     void reloadFromStorage();
     void unload();
 
+public slots:
+    void setContactOnline(QString userId, bool isOnline);
+    void acceptUnreadMessage(QString userId, bool hasUnread);
+
+signals:
+
 private:
-    Application* application;
-    QList<Contact*>* contactList;
-    QList<Contact*>* contactStorage;
+    const Application* application;
+    QList<Contact*> contactList;
+    QList<Contact*> contactStorage;
 
     SortOrder sortOrder = DescRating;
 
     bool allVisible;
     void sort();
-    void insert(Contact *contact, int index = -1);
-    void checkUnreadMessages();
-signals:
+    void insert(Contact* contact, int index = -1);
+    void checkUnreadMessages() const;
 
-public slots:
-    void setContactOnline(QString userId, bool isOnline);
-    void acceptUnreadMessage(QString userId, bool hasUnread);
 };
 
-#endif // CONTACTS_H
+
+#endif // CONTACTMODEL_H

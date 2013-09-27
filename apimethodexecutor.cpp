@@ -7,13 +7,13 @@
 #include <QEventLoop>
 #include <QJsonDocument>
 
-ApiMethodExecutor::ApiMethodExecutor(QString token, QObject *parent) : QObject(parent) {
+ApiMethodExecutor::ApiMethodExecutor(QString token, QObject* parent) : QObject(parent) {
     this->token = token;
     timeoutCounter = 0;
     networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone);
 }
 
-QJsonObject ApiMethodExecutor::executeMethod(QString methodName, QMap<QString, QString> params) {
+QJsonObject ApiMethodExecutor::executeMethod(const QString& methodName, const QMap<QString, QString>& params) const {
     QString urlStr = "https://api.vk.com/method/" + methodName + "?";
     foreach (QString paramName, params.keys()) {
         urlStr.append(paramName).append("=").append(params.value(paramName)).append("&");
@@ -22,19 +22,19 @@ QJsonObject ApiMethodExecutor::executeMethod(QString methodName, QMap<QString, Q
     urlStr.append("https=1&");
     urlStr.append("access_token=").append(token);
     qDebug() <<  "API method executing:" << methodName;
-    QUrl *url = new QUrl(urlStr);
-    QNetworkRequest *request = new QNetworkRequest(*url);
-    request->setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
-    QSslConfiguration config = request->sslConfiguration();
+    QUrl url = QUrl(urlStr);
+    QNetworkRequest request = QNetworkRequest(url);
+    request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
+    QSslConfiguration config = request.sslConfiguration();
     config.setPeerVerifyMode(QSslSocket::VerifyNone);
-    request->setSslConfiguration(config);
-    request->setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    request.setSslConfiguration(config);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
     QByteArray buffer;
-    QNetworkReply *reply = networkAccessManager->post(*request,buffer);
+    QNetworkReply* reply = networkAccessManager->post(request,buffer);
     QEventLoop eventLoop;
 
-    networkAccessManager->connect(reply,SIGNAL(finished()),&eventLoop, SLOT(quit()));    
+    networkAccessManager->connect(reply,SIGNAL(finished()),&eventLoop, SLOT(quit()));
     eventLoop.exec();
     reply->deleteLater();
     if (reply->error() == QNetworkReply::NoError) {

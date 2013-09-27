@@ -8,10 +8,10 @@
 #include <QTimer>
 #include <QShortcut>
 
-Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWidget(parent), ui(new Ui::Dialog) {
+Dialog::Dialog(const Application* application, const QString& userId, QWidget* parent) : QWidget(parent), ui(new Ui::Dialog) {
     this->application = application;
     this->userId = userId;
-    unreadInList = new QStringList();
+    unreadInList = QStringList();
     setupUi();
 
     connect(ui->textEdit
@@ -25,11 +25,11 @@ Dialog::Dialog(Application *application, QString userId, QWidget *parent) : QWid
 
     loadHistory(20);
 
-    connect(application->getLongPollExecutor()
+    connect(&application->getLongPollExecutor()
             , SIGNAL(messageRecieved(QString,bool, bool,QString,uint,QString))
             , this
             , SLOT(insertMessage(QString,bool, bool,QString,uint,QString)));
-    connect(application->getLongPollExecutor()
+    connect(&application->getLongPollExecutor()
             , SIGNAL(messageIsRead(QString))
             , this
             , SLOT(markMessageIsRead(QString)));
@@ -43,7 +43,7 @@ void Dialog::setupUi() {
     ui->splitter->setSizes(list);
 }
 
-void Dialog::connectSendMessageTriggers() {
+void Dialog::connectSendMessageTriggers() const {
     connect(ui->pushButton, SIGNAL(released()), this, SLOT(sendMessage()));
     QShortcut* shortcutCtrlEnter = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->textEdit);
     connect(shortcutCtrlEnter, SIGNAL(activated()), this, SLOT(sendMessage()));
@@ -51,12 +51,12 @@ void Dialog::connectSendMessageTriggers() {
     connect(shortcutCtrlNumEnter, SIGNAL(activated()), this, SLOT(sendMessage()));
 }
 
-void Dialog::loadHistory(int count) {
+void Dialog::loadHistory(const int count) {
     QMap<QString,QString> params;
     params.insert("count", QString::number(count));
     params.insert("user_id",userId);
 
-    QJsonObject result = application->getApiMethodExecutor()->executeMethod("messages.getHistory",params);
+    QJsonObject result = application->getApiMethodExecutor().executeMethod("messages.getHistory",params);
     QVariantList messageList = result.toVariantMap().take("response").toMap().take("items").toList();
     //messageList.removeFirst();
     QString historyHtml = "";
@@ -70,16 +70,30 @@ void Dialog::loadHistory(int count) {
             QString body = messageMap.value("body").toString();
             bool isRead = messageMap.value("read_state").toString().toInt() > 0;
 
+            applyReadState(messageId, fromId, isRead);
             historyHtml.append(prepareMessageHtml(messageId,fromId,timestamp,body,isRead));
         }
     }
     ui->webView->setHtml(historyHtml);
 }
 
-void Dialog::insertMessage(QString messageId, bool isOutbox, bool isRead, QString userId, uint timestamp, QString body) {
+void Dialog::applyReadState(const QString& messageId, const QString& fromId, const bool& isRead) {
+    if (!isRead && fromId!=application->getUserId()) {
+        unreadInList.push_back(messageId);
+    }
+}
+
+void Dialog::insertMessage(
+        const QString& messageId
+        , const bool& isOutbox
+        , const bool& isRead
+        , const QString& userId
+        , const uint& timestamp
+        , const QString& body) {
     if (userId == this->userId) {
         if (findMessageElement(messageId).isNull()) { //Для защиты от повторного добавления
             QString fromId = isOutbox ? application->getUserId() : userId;
+            applyReadState(messageId, fromId, isRead);
             QString messageHtml = prepareMessageHtml(messageId, fromId, timestamp, body, isRead);
             ui->webView->setHtml(ui->webView->page()->mainFrame()->toHtml()+messageHtml);
         }
@@ -89,12 +103,17 @@ void Dialog::insertMessage(QString messageId, bool isOutbox, bool isRead, QStrin
     }
 }
 
-QString Dialog::prepareMessageHtml(QString messageId, QString fromId, uint timestamp, QString body, bool isRead) {
+QString Dialog::prepareMessageHtml(const QString& messageId, const QString& fromId, const uint& timestamp, const QString& body, const bool& isRead) const {
     QString displayName;
     if (fromId == application->getUserId()) {
         displayName = application->getUserDisplayName();
     } else {
-        displayName = application->getContactModel()->findByUserId(fromId)->displayName;
+        Contact* contact = application->getContactModel().findByUserId(fromId);
+        if (contact != nullptr) {
+            displayName = contact->displayName;
+        } else {
+            displayName = "Неизвестный собеседник";
+        }
     }
     QString formattedDate = QDateTime::fromTime_t(timestamp).toString("dd.MM.yyyy hh:mm:ss");
     QString readStateHtml = isRead ? "background-color: #FFFFFF;" : "background-color: #E1E7ED;";
@@ -110,29 +129,25 @@ QString Dialog::prepareMessageHtml(QString messageId, QString fromId, uint times
             + "</span></div><br/><div style='padding:5px;'>"
             + body
             + "</div></div>";
-
-    if (!isRead && fromId!=application->getUserId()) {
-        unreadInList->push_back(messageId);
-    }
     return messageHtml;
 }
 
 void Dialog::markInboxRead() {
-    if (unreadInList->count() > 0) {
-        application->getContactModel()->acceptUnreadMessage(userId,false);
+    if (unreadInList.count() > 0) {
+        application->getContactModel().acceptUnreadMessage(userId,false);
         QString messageIds = "";
-        while (unreadInList->count()>0) {
-            QString messageId = unreadInList->takeFirst();
+        while (unreadInList.count()>0) {
+            QString messageId = unreadInList.takeFirst();
             markMessageIsRead(messageId);
             messageIds.append(messageId);
-            if (unreadInList->count()>1) {
+            if (unreadInList.count()>1) {
                 messageIds.append(",");
             }
         }
         QMap<QString,QString> params;
         params.insert("message_ids", messageIds);
         params.insert("user_id",this->userId);
-        QJsonObject response = application->getApiMethodExecutor()->executeMethod("messages.markAsRead",params);
+        QJsonObject response = application->getApiMethodExecutor().executeMethod("messages.markAsRead",params);
 
         if (response.toVariantMap().value("response").toString().toInt() != 1) {
             qDebug() << "mark message as read FAILURE";
@@ -140,13 +155,13 @@ void Dialog::markInboxRead() {
     }
 }
 
-QWebElement Dialog::findMessageElement(QString messageId) {
+QWebElement Dialog::findMessageElement(const QString& messageId) const {
     QString query = "#m"+messageId;
     QWebElement messageElement = ui->webView->page()->mainFrame()->findFirstElement(query);
     return messageElement;
 }
 
-void Dialog::markMessageIsRead(QString messageId) {
+void Dialog::markMessageIsRead(const QString& messageId) const {
     QWebElement messageElement = findMessageElement(messageId);
     if (!messageElement.isNull()) {
         messageElement.setStyleProperty("background-color","#FFFFFF");
@@ -156,7 +171,7 @@ void Dialog::markMessageIsRead(QString messageId) {
 
 }
 
-void Dialog::sendMessage() {
+void Dialog::sendMessage() const {
     QString messageText = ui->textEdit->toPlainText();
     if (!messageText.isEmpty()) {
         QMap<QString,QString> params;
@@ -165,23 +180,23 @@ void Dialog::sendMessage() {
         params.insert("user_ids", userId);
         params.insert("type","1");
 
-        QJsonObject response = application->getApiMethodExecutor()->executeMethod("messages.send",params);
+        QJsonObject response = application->getApiMethodExecutor().executeMethod("messages.send",params);
         ui->textEdit->clear();
     }
 }
 
-void Dialog::setUserOnline(bool isOnline) {
+void Dialog::setUserOnline(const bool isOnline) const{
     QString text = isOnline ? "В сети" : "Не в сети";
     ui->label->setText(text);
 }
 
 
 
-void Dialog::scrollToBottom(QSize size){
+void Dialog::scrollToBottom(const QSize& size) const{
     ui->webView->page()->mainFrame()->setScrollBarValue(Qt::Vertical, size.height());
 }
 
-void Dialog::checkSendAvailable() {
+void Dialog::checkSendAvailable() const {
     bool isEnabled = !ui->textEdit->toPlainText().isEmpty();
     if (ui->pushButton->isEnabled() != isEnabled) {
         ui->pushButton->setEnabled(isEnabled);

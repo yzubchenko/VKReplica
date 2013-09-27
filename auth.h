@@ -8,41 +8,35 @@
 #include <QMap>
 #include <QEventLoop>
 
-class Auth : public QWidget
-{
+class Auth : public QWidget {
     Q_OBJECT
-private:
-    QWebView *webView;
-    QString token;
-    QString userId;
-    QString expiresIn;
-    QUrl *url;
-    bool isLogin;
 
-    QMap<QString, QString>* parseReplyFragment(QString authFragment);
-    void refreshWebView();
-    void calculateWebViewGeometry();
-    void showErrorDialog(QString message);
 public:
-    explicit Auth(QWidget *parent = 0);
-
-    QString getToken() const { return token; }
-
-    QString getUserId() const { return userId; }
-
-    QString getExpiresIn() const { return expiresIn; }
-
-
+    explicit Auth(QWidget* parent = 0);
+    const QString& getToken() const { return token; }
+    const QString& getUserId() const { return userId; }
+    const QString& getExpiresIn() const { return expiresIn; }
     ~Auth();
 
+public slots:
+    void handleReply(QNetworkReply* reply);
+    void showAuthDialog() const;
+    void changeAuthStatus();
 
 signals:
     void authStatusChanged(bool isLogin);
-public slots:
-    void handleReply(QNetworkReply *reply);
-    void showAuthDialog();
-    void changeAuthStatus();
 
+private:
+    QWebView* webView;
+    QString token;
+    QString userId;
+    QString expiresIn;
+    QUrl url;
+    bool isLogin;
+
+    QMap<QString, QString> parseReplyFragment(const QString authFragment) const;
+    void refreshWebView() const;
+    void calculateWebViewGeometry() const;
 };
 
 #endif // AUTH_H

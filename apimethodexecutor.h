@@ -7,18 +7,17 @@
 #include <QString>
 #include "connection/customnetworkmanager.h"
 
-class ApiMethodExecutor : public QObject
-{
+class ApiMethodExecutor : public QObject {
     Q_OBJECT
 
 public:
-    explicit ApiMethodExecutor(QString token, QObject *parent = 0);
-    QJsonObject executeMethod(QString methodName, QMap<QString,QString> params);
+    explicit ApiMethodExecutor(QString token, QObject* parent = 0);
+    QJsonObject executeMethod(const QString& methodName, const QMap<QString,QString>& params) const;
     ~ApiMethodExecutor();
 signals:
-    void networkStatus(bool isOk);
+    void networkStatus(bool isOk) const;
 private:
-    CustomNetworkAccessManager *networkAccessManager;
+    CustomNetworkAccessManager* networkAccessManager;
     QString token;
     volatile unsigned int timeoutCounter;
 };

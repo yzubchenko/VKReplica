@@ -2,11 +2,11 @@
 
 #include <QTextEdit>
 
-FocusTextEdit::FocusTextEdit(QWidget *parent) : QTextEdit(parent){
+FocusTextEdit::FocusTextEdit(QWidget* parent) : QTextEdit(parent){
 
 }
 
-void FocusTextEdit::focusInEvent(QFocusEvent *event) {
+void FocusTextEdit::focusInEvent(QFocusEvent* event) {
     QTextEdit::focusInEvent(event);
     emit focusIn();
 }

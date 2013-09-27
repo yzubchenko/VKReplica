@@ -13,7 +13,7 @@ CustomNetworkAccessManager::CustomNetworkAccessManager (QSsl::SslProtocol protoc
     this->setCookieJar(cookieJar);
 }
 
-QNetworkReply * CustomNetworkAccessManager::createRequest ( Operation op, const QNetworkRequest &req, QIODevice * outgoingData ) {
+QNetworkReply * CustomNetworkAccessManager::createRequest (Operation op, const QNetworkRequest& req, QIODevice* outgoingData ) {
     QSslConfiguration config = req.sslConfiguration();
     config.setPeerVerifyMode(mode);
     config.setProtocol(protocol);

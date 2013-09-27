@@ -33,8 +33,6 @@ void Application::exec() {
     contactModel = new ContactModel(this,this);
     mainWindow = new MainWindow(this, contactModel);
     mainWindow->show();
-
-
 }
 
 void Application::applyUser() {

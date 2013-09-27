@@ -3,16 +3,13 @@
 
 #include <QTextEdit>
 
-class FocusTextEdit : public QTextEdit
-{
+class FocusTextEdit : public QTextEdit {
     Q_OBJECT
 public:
-    explicit FocusTextEdit(QWidget *parent = 0);
-    virtual void focusInEvent(QFocusEvent *event);
+    explicit FocusTextEdit(QWidget* parent = 0);
+    virtual void focusInEvent(QFocusEvent* event);
 signals:
     void focusIn();
-public slots:
-
 };
 
 #endif // FOCUSTEXTEDIT_H
