@@ -30,8 +30,7 @@ void Application::exec() {
     connect(auth, SIGNAL(authStatusChanged(bool)), this, SLOT(onAuthStatusChanged(bool)));
     auth->showAuthDialog();
 
-    contactModel = new ContactModel(this,this);
-    mainWindow = new MainWindow(this, contactModel);
+    mainWindow = new MainWindow(this);
     mainWindow->show();
 }
 
@@ -82,5 +81,9 @@ void Application::onNetworkStatus(bool isOk) {
 
 Application::~Application() {
 
+}
+
+ContactModel &Application::getContactModel() const {
+    return mainWindow->getContactModel();
 }
 

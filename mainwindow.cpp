@@ -10,14 +10,15 @@
 #include <QVariantList>
 #include <QVariantMap>
 #include <QFile>
+#include <QStackedLayout>
 #include "contactdelegate.h"
 #include <QList>
 #include "longpollexecutor.h"
 #include "application.h"
 
-MainWindow::MainWindow(const Application* application, ContactModel* contactModel, QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(const Application* application, QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     this->application = application;
-    this->contactModel = contactModel;
+    this->contactModel = new ContactModel(application,this);
     ui->setupUi(this);
     isOnline = false;
 
@@ -26,17 +27,18 @@ MainWindow::MainWindow(const Application* application, ContactModel* contactMode
 //    QRect *mainWindowRect = new QRect((screenRect.width()-260), (screenRect.height()-400), 260, 400);
 //    this->setGeometry(*mainWindowRect); /**Windows 2 screen bug**/
     ui->statusButton->setEnabled(false);
+    ui->toolFrame->setEnabled(false);
     ui->usernameLabel->setText("Требуется авторизация");
-    ContactDelegate* htmlDelegate = new ContactDelegate();
-    ui->listView->setItemDelegate(htmlDelegate);
-    connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)),this, SLOT(showDialog(QModelIndex)));
+    ContactDelegate* contactDelegate = new ContactDelegate();
+    ui->contactsListView->setItemDelegate(contactDelegate);
+    connect(ui->contactsListView, SIGNAL(doubleClicked(QModelIndex)),this, SLOT(showDialog(QModelIndex)));
     connect(ui->authButton, SIGNAL(clicked()),&application->getAuth(), SLOT(changeAuthStatus()));
     contactsAllVisible = true;
     connect(ui->contactsVisibilityButton, SIGNAL(clicked()), this, SLOT(switchContactsVisibility()));
     isSoundOn = true;
     connect(ui->soundButton, SIGNAL(clicked()), this, SLOT(switchSound()));
+    connect(ui->musicButton, SIGNAL(clicked()), this, SLOT(showAudioPlayer()));
     setupStatusButton();
-
     player = new QMediaPlayer(this);
     if (!QFile::exists(tempMessageSoundPath)) {
         QFile::copy(messageSoundResourcePath, tempMessageSoundPath);
@@ -45,18 +47,23 @@ MainWindow::MainWindow(const Application* application, ContactModel* contactMode
     player->setMedia(QUrl::fromLocalFile(tempMessageSoundPath));
     player->setVolume(100);
 
+
 }
 
 void MainWindow::applyAuthStatus(const bool& isAuthComplete) {
     this->isAuthComplete = isAuthComplete;
     if (isAuthComplete) {
-        dialogManager = new DialogManager(application,0);
+        dialogManager = new DialogManager(application,this);
+        audioPlayer = new AudioPlayer(application, this);
+        ui->toolFrame->setEnabled(true);
         ui->statusButton->setEnabled(true);
         ui->authButton->setIcon(logoutIcon);
         applyOnlineStatus(ui->onlineAction);
         ui->usernameLabel->setText(application->getUserDisplayName());
     } else {
         dialogManager->deleteLater();
+        audioPlayer->deleteLater();
+        ui->toolFrame->setEnabled(false);
         ui->statusButton->setEnabled(false);
         ui->authButton->setIcon(loginIcon);
         applyOnlineStatus(ui->offlineAction);
@@ -71,8 +78,8 @@ void MainWindow::applyOnlineStatus(QAction* action){
             ui->statusButton->setText("В сети");
 
             contactModel->load();
-            ui->listView->setModel(contactModel);
-            ui->listView->setEnabled(true);
+            ui->contactsListView->setModel(contactModel);
+            ui->contactsListView->setEnabled(true);
             application->getApiMethodExecutor().executeMethod("account.setOnline", QMap<QString,QString>());
             connect(&application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)), this, SLOT(onMessage()));
             application->getLongPollExecutor().start();
@@ -87,8 +94,8 @@ void MainWindow::applyOnlineStatus(QAction* action){
             application->getLongPollExecutor().stop();
             disconnect(&application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)), this, SLOT(onMessage()));
             //application->getApiMethodExecutor()->executeMethod("account.setOffline", QMap<QString,QString>());
-            ui->listView->setEnabled(false);
-            ui->listView->setModel(NULL);
+            ui->contactsListView->setEnabled(false);
+            ui->contactsListView->setModel(NULL);
             contactModel->unload();
         }
 
@@ -110,6 +117,10 @@ void MainWindow::switchContactsVisibility() {
     contactsAllVisible = !contactsAllVisible;
     ui->contactsVisibilityButton->setIcon(contactsAllVisible ? contactsAllVisibleIcon : contactsOnlineOnlyIcon);
     contactModel->applyContactsVisibility(contactsAllVisible);
+}
+
+void MainWindow::showAudioPlayer() {
+    audioPlayer->show();
 }
 
 void MainWindow::switchSound() {
@@ -134,7 +145,7 @@ void MainWindow::setupStatusButton() const {
 
 MainWindow::~MainWindow() {
     delete ui;
-    application = NULL;
-    dialogManager = NULL;
-    contactModel = NULL;
+    application = nullptr;
+    dialogManager = nullptr;
+    contactModel = nullptr;
 }

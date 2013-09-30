@@ -3,6 +3,7 @@
 
 #include "application.h"
 
+#include <QWebElement>
 #include <QWidget>
 
 namespace Ui {

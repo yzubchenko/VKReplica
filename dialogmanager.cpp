@@ -23,7 +23,7 @@ DialogManager::~DialogManager() {
 
 void DialogManager::showDialog(const Contact& contact) {
     if (!dialogMap.contains(contact.userId)) {
-        Dialog* dialog= new Dialog(application, contact.userId, this);
+        Dialog* dialog = new Dialog(application, contact.userId, ui->tabWidget);
         dialog->setUserOnline(contact.isOnline);
         dialogMap.insert(contact.userId,dialog);
         QIcon statusIcon = contact.isOnline ? application->getOnlineIcon() : application->getOfflineIcon();

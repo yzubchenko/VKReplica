@@ -28,7 +28,10 @@ SOURCES += main.cpp\
     dialogmanager.cpp \
     dialog.cpp \
     contactdelegate.cpp \
-    focustextedit.cpp
+    focustextedit.cpp \
+    audioplayer.cpp \
+    audiomodel.cpp \
+    audiodelegate.cpp
 
 HEADERS  += mainwindow.h \
     connection/customnetworkmanager.h \
@@ -42,11 +45,15 @@ HEADERS  += mainwindow.h \
     longpollexecutor.h \
     dialogmanager.h \
     dialog.h \
-    focustextedit.h
+    focustextedit.h \
+    audioplayer.h \
+    audiomodel.h \
+    audiodelegate.h
 
 FORMS    += mainwindow.ui \
     dialogmanager.ui \
-    dialog.ui
+    dialog.ui \
+    audioplayer.ui
 
 RESOURCES += \
     resources.qrc

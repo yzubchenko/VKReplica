@@ -7,8 +7,7 @@
 #include <QApplication>
 #include <QPainter>
 
-void ContactDelegate::paint(QPainter* painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
+void ContactDelegate::paint(QPainter* painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     QStyledItemDelegate::paint(painter,option,index);
     painter->save();
     Contact* contact = qvariant_cast<Contact*>(index.data());

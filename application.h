@@ -6,7 +6,6 @@
 #include "apimethodexecutor.h"
 
 class ContactModel;
-
 class LongPollExecutor;
 class MainWindow;
 
@@ -19,7 +18,7 @@ public:
     ~Application();
 
     LongPollExecutor& getLongPollExecutor() const {return *longPollExecutor;}
-    ContactModel& getContactModel() const {return *contactModel;}
+    ContactModel& getContactModel() const;
     const QString& getUserDisplayName() const {return userDisplayName;}
     const QString& getUserId() const {return userId;}
     const Auth& getAuth() const { return *auth; }
@@ -32,7 +31,6 @@ private:
     Auth* auth;
     ApiMethodExecutor* apiMethodExecutor;
     LongPollExecutor* longPollExecutor;
-    ContactModel* contactModel;
     QString userDisplayName;
     QString userId;
     MainWindow* mainWindow;

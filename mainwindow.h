@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "audioplayer.h"
 #include "contactmodel.h"
 #include "dialogmanager.h"
 
@@ -8,31 +9,35 @@
 #include <QMediaPlayer>
 #include <QStandardPaths>
 
+class Application;
 
 namespace Ui {
-class Application;
+
 class MainWindow;
 }
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    explicit MainWindow(const Application* application, ContactModel* contactModel, QWidget* parent = 0);
+    explicit MainWindow(const Application* application, QWidget* parent = 0);
     ~MainWindow();
     void applyAuthStatus(const bool& isAuthComplete);
+    ContactModel& getContactModel() const {return *contactModel;}
 public slots:
     void showDialog(const QModelIndex& modelIndex) const;
     void applyOnlineStatus(QAction* action);
     void applyOnlineStatus(bool isOnline);
     void onMessage() const;
     void switchContactsVisibility();
+    void showAudioPlayer();
     void switchSound();
 private:
     bool isAuthComplete;
-    Ui::MainWindow *ui;
-    const Application *application;
-    ContactModel *contactModel;
-    DialogManager *dialogManager;
+    Ui::MainWindow* ui;
+    const Application* application;
+    ContactModel* contactModel;
+    DialogManager* dialogManager;
+    AudioPlayer* audioPlayer;
 
     const QIcon loginIcon = QIcon(":/main_window/resources/loginButton.png");
     const QIcon logoutIcon = QIcon(":/main_window/resources/logoutButton.png");
