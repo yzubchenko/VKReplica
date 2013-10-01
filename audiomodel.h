@@ -4,6 +4,7 @@
 #include "application.h"
 
 #include <QAbstractListModel>
+#include <QMediaPlaylist>
 #include <QObject>
 
 struct Audio {
@@ -11,6 +12,7 @@ struct Audio {
     QString displayName;
     unsigned long duration;
     QString url;
+    bool isPlaying;
 };
 
 Q_DECLARE_METATYPE(Audio*)
@@ -24,13 +26,18 @@ public:
     QVariant data(const QModelIndex& index, int role) const;
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    Audio* getByRow(int row) const;
+    QMediaPlaylist* getPlaylist() const {return playlist;}
 signals:
 
 public slots:   
     void search(QString message);
+    void refreshCurrentPlaying(int currentPlaying);
 private:
     const Application* application;
     QList<Audio*> audioList;
+    QMediaPlaylist* playlist;
+    int currentPlaying;
 
 };
 

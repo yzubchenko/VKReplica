@@ -5,6 +5,7 @@
 #include "audiomodel.h"
 
 #include <QDialog>
+#include <QMediaPlayer>
 
 class Application;
 namespace Ui {
@@ -26,6 +27,12 @@ private:
     Ui::AudioPlayer* ui;
     const Application* application;
     AudioModel* audioModel;
+    QMediaPlayer* player;
+private slots:
+    void onRowDoubleClicked(QModelIndex modelIdx) const;
+    void onPositionChanged(qint64 pos) const;
+    void onCurrentAudioIndexChanged(int index) const;
+
 };
 
 #endif // AUDIOPLAYER_H

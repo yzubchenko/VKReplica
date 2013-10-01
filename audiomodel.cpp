@@ -1,8 +1,11 @@
 #include "audiomodel.h"
+#include <QMediaContent>
 
 AudioModel::AudioModel(const Application* application, QObject* parent) : QAbstractListModel(parent) {
     this->application = application;
     this->audioList = QList<Audio*>();
+    this->playlist = new QMediaPlaylist(this);
+    this->currentPlaying = -1;
 }
 
 int AudioModel::rowCount(const QModelIndex &parent) const {
@@ -27,6 +30,7 @@ QVariant AudioModel::data(const QModelIndex &index, int role) const {
 
 void AudioModel::search(QString message) {
     audioList.clear();
+    playlist->clear();
     if (!message.isEmpty()) {
         QMap<QString,QString> params;
         params.insert("q",message);
@@ -34,6 +38,7 @@ void AudioModel::search(QString message) {
         params.insert("sort","2");
         params.insert("count","200");
         QJsonObject result = application->getApiMethodExecutor().executeMethod("audio.search",params);
+
         QVariantList items = result.toVariantMap().take("response").toMap().take("items").toList();
         foreach (QVariant item, items) {
             QVariantMap itemMap = item.toMap();
@@ -43,13 +48,31 @@ void AudioModel::search(QString message) {
                     .append(itemMap.take("title").toString());
             unsigned long duration = floor(itemMap.take("duration").toDouble());
             QString url = itemMap.take("url").toString();
-            Audio* audio = new Audio{id, displayName, duration, url};
+            Audio* audio = new Audio{id, displayName, duration, url, false};
             audioList.push_back(audio);
+
+            QMediaContent mediaContent = QMediaContent(url);
+            playlist->addMedia(mediaContent);
         }
         int i=0;
     }
     emit dataChanged(index(0), index(audioList.size()-1));
 
+}
+
+void AudioModel::refreshCurrentPlaying(int currentPlaying) {
+    if (this->currentPlaying >= 0) {
+        audioList.at(this->currentPlaying)->isPlaying = false;
+    }
+    emit dataChanged(index(this->currentPlaying), index(this->currentPlaying));
+
+    if (currentPlaying < 0 || currentPlaying >= audioList.size()) {
+        this->currentPlaying = -1;
+        return;
+    }
+    this->currentPlaying = currentPlaying;
+    audioList.at(this->currentPlaying)->isPlaying = true;
+    emit dataChanged(index(this->currentPlaying), index(this->currentPlaying));
 }
 
 bool AudioModel::insertRows(int row, int count, const QModelIndex &parent) {
@@ -75,4 +98,11 @@ bool AudioModel::removeRows(int row, int count, const QModelIndex &parent) {
     }
     endRemoveRows();
     return true;
+}
+
+Audio* AudioModel::getByRow(int row) const {
+    if (row<0 || row>=audioList.size()) {
+        return nullptr;
+    }
+    return audioList.at(row);
 }

@@ -2,15 +2,44 @@
 #include "audiomodel.h"
 
 #include <QTextDocument>
+#include <QApplication>
 
 void AudioDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const {
     QStyledItemDelegate::paint(painter,option,index);
     painter->save();
     Audio* audio = qvariant_cast<Audio*>(index.data());
-
     QString displayName = audio->displayName;
 
-    painter->drawText(option.rect,displayName);
+    QIcon playingIcon;
+    if (audio->isPlaying) {
+        playingIcon = QIcon(":/audioplayer/resources/playPlayer.png");
+    } else {
+        playingIcon = QIcon();
+    }
+
+    QFont font = QApplication::font();
+    QFontMetrics fm(font);
+
+    QRect playingIconRect = option.rect;
+    QRect displayNameRect = option.rect;
+
+
+    QSize playingIconsize = QSize(16,16);
+    playingIconRect.setLeft(option.rect.left()+4);
+    playingIconRect.setRight(playingIconRect.left()+16);
+    playingIconRect.setTop(option.rect.top()+(option.rect.height() - 16)/2);
+
+    displayNameRect.setLeft(playingIconRect.right()+6);
+    displayNameRect.setTop(displayNameRect.top()+(option.rect.height() -fm.height())/2);
+    displayNameRect.setBottom(displayNameRect.top()+fm.height());
+
+    painter->drawPixmap(QPoint(playingIconRect.left(),playingIconRect.top())
+                        ,playingIcon.pixmap(playingIconsize.width(),playingIconsize.height()));
+
+
+    painter->setFont(font);
+    painter->drawText(displayNameRect,displayName);
+
     painter->restore();
 }
 
