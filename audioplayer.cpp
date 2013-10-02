@@ -19,7 +19,16 @@ AudioPlayer::AudioPlayer(const Application* application, QWidget *parent) : QDia
     player->setPlaylist(audioModel->getPlaylist());
     connect(player->playlist(), SIGNAL(currentIndexChanged(int)), audioModel, SLOT(refreshCurrentPlaying(int)));
     connect(player->playlist(), SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentAudioIndexChanged(int)));
+    connect(player, SIGNAL(durationChanged(qint64)), this, SLOT(onDurationChanged(qint64)));
     connect(player, SIGNAL(positionChanged(qint64)), this, SLOT(onPositionChanged(qint64)));
+    connect(player, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(onStateChanged(QMediaPlayer::State)));
+
+    connect(ui->playButton, SIGNAL(clicked()), this, SLOT(onPlay()));
+    connect(ui->prevButton, SIGNAL(clicked()), this, SLOT(onPrevious()));
+    connect(ui->nextButton, SIGNAL(clicked()), this, SLOT(onNext()));
+    connect(ui->volumeControl, SIGNAL(valueChanged(int)), this, SLOT(onSetVolume(int)));
+    connect(ui->elapsedBar, SIGNAL(mouseReleasedOnValue(uint)), this, SLOT(onMouseReleasedOnValue(uint)));
+    connect(ui->elapsedBar, SIGNAL(mousePressedOnValue(uint)), this, SLOT(onMousePressed()));
 }
 
 AudioPlayer::~AudioPlayer() {
@@ -32,17 +41,77 @@ void AudioPlayer::onSearchButtonClicked() {
     }
 }
 
+void AudioPlayer::onPrevious() const {
+    if (player->position() > 3000) { //если больше 3 секунд от начала прослушивания
+        onMouseReleasedOnValue(0);   //устанавливаем позицию на начало
+    } else {
+        player->playlist()->previous();
+    }
+}
+
+void AudioPlayer::onNext() const {
+    player->playlist()->next();
+}
+
+void AudioPlayer::onSetVolume(int volume) const {
+    player->setVolume(volume);
+}
+
 void AudioPlayer::onRowDoubleClicked(QModelIndex modelIdx) const {
     player->playlist()->setCurrentIndex(modelIdx.row());
     player->play();
 }
 
+void AudioPlayer::onDurationChanged(qint64 duration) const {
+    ui->elapsedBar->setRange(0,duration);
+}
+
 void AudioPlayer::onPositionChanged(qint64 pos) const {
-    ui->elapsedBar->setValue((int)(pos/1000));
+    ui->elapsedBar->setValue(pos);
+    QString value = QString(" [").append(QString::number((int)(pos/1000))).append(" : ").append(QString::number((int)(ui->elapsedBar->maximum()/1000))).append("]");
+    ui->elapsedBar->setValueText(value);
+
 }
 
 void AudioPlayer::onCurrentAudioIndexChanged(int index) const {
-    ui->elapsedBar->setRange(0,audioModel->getByRow(index)->duration);
-    ui->elapsedBar->setFormat(audioModel->getByRow(index)->displayName);
+    ui->elapsedBar->setBaseText(audioModel->getByRow(index)->displayName);
 }
+
+void AudioPlayer::onStateChanged(QMediaPlayer::State state) {
+    switch (state) {
+        case QMediaPlayer::PlayingState:{
+            ui->playButton->setIcon(pauseIcon);
+            break;
+        }
+        case QMediaPlayer::StoppedState:
+        case QMediaPlayer::PausedState: {
+            ui->playButton->setIcon(playIcon);
+            break;
+        }
+    }
+    emit stateChanged(state);
+}
+
+void AudioPlayer::onPlay() const {
+    if (player->state() == QMediaPlayer::PlayingState) {
+        player->pause();
+    } else {
+        player->play();
+    }
+}
+
+void AudioPlayer::onMousePressed() {
+    isPlayingOnMouseHold = player->state() == QMediaPlayer::PlayingState;
+    player->pause();
+}
+
+
+void AudioPlayer::onMouseReleasedOnValue(uint pos) const {
+    player->setPosition(pos);
+    if (isPlayingOnMouseHold) {
+        player->play();
+    }
+
+}
+
 

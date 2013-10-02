@@ -47,7 +47,6 @@ MainWindow::MainWindow(const Application* application, QWidget* parent) : QMainW
     player->setMedia(QUrl::fromLocalFile(tempMessageSoundPath));
     player->setVolume(100);
 
-
 }
 
 void MainWindow::applyAuthStatus(const bool& isAuthComplete) {
@@ -55,11 +54,16 @@ void MainWindow::applyAuthStatus(const bool& isAuthComplete) {
     if (isAuthComplete) {
         dialogManager = new DialogManager(application,this);
         audioPlayer = new AudioPlayer(application, this);
+        connect(ui->prevButton, SIGNAL(clicked()), audioPlayer, SLOT(onPrevious()));
+        connect(ui->playButton, SIGNAL(clicked()), audioPlayer, SLOT(onPlay()));
+        connect(ui->nextButton, SIGNAL(clicked()), audioPlayer, SLOT(onNext()));
+        connect(audioPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(onPlayerStateChanged(QMediaPlayer::State)));
         ui->toolFrame->setEnabled(true);
         ui->statusButton->setEnabled(true);
         ui->authButton->setIcon(logoutIcon);
         applyOnlineStatus(ui->onlineAction);
         ui->usernameLabel->setText(application->getUserDisplayName());
+
     } else {
         dialogManager->deleteLater();
         audioPlayer->deleteLater();
@@ -141,6 +145,20 @@ void MainWindow::setupStatusButton() const {
     ui->statusButton->addAction(ui->offlineAction);
     ui->statusButton->addAction(ui->onlineAction);
     connect(ui->statusButton, SIGNAL(triggered(QAction*)), this, SLOT(applyOnlineStatus(QAction*)));
+}
+
+void MainWindow::onPlayerStateChanged(QMediaPlayer::State state) const {
+    switch (state) {
+        case QMediaPlayer::PlayingState:{
+            ui->playButton->setIcon(audioPlayer->pauseIcon);
+            break;
+        }
+        case QMediaPlayer::StoppedState:
+        case QMediaPlayer::PausedState: {
+            ui->playButton->setIcon(audioPlayer->playIcon);
+            break;
+        }
+    }
 }
 
 MainWindow::~MainWindow() {

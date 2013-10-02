@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     focustextedit.cpp \
     audioplayer.cpp \
     audiomodel.cpp \
-    audiodelegate.cpp
+    audiodelegate.cpp \
+    draggableprogressbar.cpp
 
 HEADERS  += mainwindow.h \
     connection/customnetworkmanager.h \
@@ -48,7 +49,8 @@ HEADERS  += mainwindow.h \
     focustextedit.h \
     audioplayer.h \
     audiomodel.h \
-    audiodelegate.h
+    audiodelegate.h \
+    draggableprogressbar.h
 
 FORMS    += mainwindow.ui \
     dialogmanager.ui \

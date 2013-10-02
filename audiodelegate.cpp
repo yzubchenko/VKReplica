@@ -24,13 +24,13 @@ void AudioDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
     QRect displayNameRect = option.rect;
 
 
-    QSize playingIconsize = QSize(16,16);
+    QSize playingIconsize = QSize(11,11);
     playingIconRect.setLeft(option.rect.left()+4);
-    playingIconRect.setRight(playingIconRect.left()+16);
-    playingIconRect.setTop(option.rect.top()+(option.rect.height() - 16)/2);
+    playingIconRect.setRight(playingIconRect.left()+playingIconsize.width()+4);
+    playingIconRect.setTop(option.rect.top()+(option.rect.height() - playingIconsize.height())/2);
 
-    displayNameRect.setLeft(playingIconRect.right()+6);
-    displayNameRect.setTop(displayNameRect.top()+(option.rect.height() -fm.height())/2);
+    displayNameRect.setLeft(playingIconRect.right());
+    displayNameRect.setTop(displayNameRect.top()+(option.rect.height() - fm.height())/2);
     displayNameRect.setBottom(displayNameRect.top()+fm.height());
 
     painter->drawPixmap(QPoint(playingIconRect.left(),playingIconRect.top())

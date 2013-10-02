@@ -31,6 +31,7 @@ public slots:
     void switchContactsVisibility();
     void showAudioPlayer();
     void switchSound();
+    void onPlayerStateChanged(QMediaPlayer::State state) const;
 private:
     bool isAuthComplete;
     Ui::MainWindow* ui;
