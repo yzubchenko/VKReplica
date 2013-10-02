@@ -11,12 +11,13 @@ AudioPlayer::AudioPlayer(const Application* application, QWidget *parent) : QDia
     connect(this, SIGNAL(searchRequest(QString)), audioModel, SLOT(search(QString)));
     ui->setupUi(this);
     connect(ui->searchButton, SIGNAL(clicked()), this, SLOT(onSearchButtonClicked()));
-    connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onRowDoubleClicked(QModelIndex)));
+    connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(onSearchButtonClicked()));
 
     ui->listView->setModel(audioModel);
     ui->listView->setItemDelegate(new AudioDelegate());
     player = new QMediaPlayer(this,QMediaPlayer::StreamPlayback);
     player->setPlaylist(audioModel->getPlaylist());
+    connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onRowDoubleClicked(QModelIndex)));
     connect(player->playlist(), SIGNAL(currentIndexChanged(int)), audioModel, SLOT(refreshCurrentPlaying(int)));
     connect(player->playlist(), SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentAudioIndexChanged(int)));
     connect(player, SIGNAL(durationChanged(qint64)), this, SLOT(onDurationChanged(qint64)));
@@ -68,13 +69,15 @@ void AudioPlayer::onDurationChanged(qint64 duration) const {
 
 void AudioPlayer::onPositionChanged(qint64 pos) const {
     ui->elapsedBar->setValue(pos);
-    QString value = QString(" [").append(QString::number((int)(pos/1000))).append(" : ").append(QString::number((int)(ui->elapsedBar->maximum()/1000))).append("]");
-    ui->elapsedBar->setValueText(value);
+    QDateTime posTime = QDateTime::fromTime_t((pos/1000));
+    QString posStr = posTime.toString("mm:ss");
+    ui->elapsedBar->setValueText(posStr);
 
 }
 
 void AudioPlayer::onCurrentAudioIndexChanged(int index) const {
     ui->elapsedBar->setBaseText(audioModel->getByRow(index)->displayName);
+    ui->elapsedBar->setTotalText(audioModel->getByRow(index)->duration);
 }
 
 void AudioPlayer::onStateChanged(QMediaPlayer::State state) {

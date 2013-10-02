@@ -18,6 +18,8 @@ Dialog::Dialog(const Application* application, const QString& userId, QWidget* p
             , SIGNAL(focusIn())
             , this
             , SLOT(markInboxRead()));
+
+
     connect(ui->webView->page()->mainFrame()
             , SIGNAL(contentsSizeChanged(QSize))
             , this
@@ -33,7 +35,8 @@ Dialog::Dialog(const Application* application, const QString& userId, QWidget* p
             , SIGNAL(messageIsRead(QString))
             , this
             , SLOT(markMessageIsRead(QString)));
-    connectSendMessageTriggers();
+    connect(ui->textEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
+    connect(ui->pushButton, SIGNAL(released()), this, SLOT(sendMessage()));
 }
 
 void Dialog::setupUi() {
@@ -41,14 +44,6 @@ void Dialog::setupUi() {
     QList<int> list = QList<int>();
     list << 200 << 100;
     ui->splitter->setSizes(list);
-}
-
-void Dialog::connectSendMessageTriggers() const {
-    connect(ui->pushButton, SIGNAL(released()), this, SLOT(sendMessage()));
-    QShortcut* shortcutCtrlEnter = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return), ui->textEdit);
-    connect(shortcutCtrlEnter, SIGNAL(activated()), this, SLOT(sendMessage()));
-    QShortcut* shortcutCtrlNumEnter = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Enter), ui->textEdit);
-    connect(shortcutCtrlNumEnter, SIGNAL(activated()), this, SLOT(sendMessage()));
 }
 
 void Dialog::loadHistory(const int count) {

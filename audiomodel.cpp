@@ -46,15 +46,16 @@ void AudioModel::search(QString message) {
             QString displayName = itemMap.take("artist").toString()
                     .append(" - ")
                     .append(itemMap.take("title").toString());
-            unsigned long duration = floor(itemMap.take("duration").toDouble());
+            int duration = floor(itemMap.take("duration").toDouble());
+            QDateTime durationTime = QDateTime::fromTime_t(duration);
+            QString durationStr = durationTime.toString("mm:ss");
             QString url = itemMap.take("url").toString();
-            Audio* audio = new Audio{id, displayName, duration, url, false};
+            Audio* audio = new Audio{id, displayName, durationStr, url, false};
             audioList.push_back(audio);
 
             QMediaContent mediaContent = QMediaContent(url);
             playlist->addMedia(mediaContent);
         }
-        int i=0;
     }
     emit dataChanged(index(0), index(audioList.size()-1));
 

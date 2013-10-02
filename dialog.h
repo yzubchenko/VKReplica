@@ -39,15 +39,14 @@ private:
     QStringList unreadInList;
 
     void setupUi();
-    void connectSendMessageTriggers() const;
     void loadHistory(const int count);
     QString prepareMessageHtml(const QString& messageId, const QString& fromId, const uint& timestamp, const QString& body, const bool& isRead) const;
     QWebElement findMessageElement(const QString& messageId) const;
+
     void applyReadState(const QString& messageId, const QString& fromId, const bool& isRead);
 private slots:
     void scrollToBottom(const QSize& s) const;
     void checkSendAvailable() const;
-
 };
 
 #endif // DIALOG_H

@@ -1,6 +1,7 @@
 #include "draggableprogressbar.h"
 
 DraggableProgressBar::DraggableProgressBar(QWidget *parent) : QProgressBar(parent) {
+    delimeter = "/";
 }
 
 void DraggableProgressBar::setBaseText(QString text) {
@@ -8,8 +9,17 @@ void DraggableProgressBar::setBaseText(QString text) {
     setFormat(this->text);
 }
 
+void DraggableProgressBar::setTotalText(QString text) {
+    this->totalText = text;
+}
+
+void DraggableProgressBar::setDelimeter(QString delimeter) {
+    this->delimeter = delimeter;
+}
+
 void DraggableProgressBar::setValueText(QString value) {
-    QString format = text + value;
+    QString format = text;
+    format.append(" [").append(value).append(delimeter).append(totalText).append("]");
     setFormat(format);
 }
 

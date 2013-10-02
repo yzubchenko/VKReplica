@@ -10,7 +10,7 @@
 struct Audio {
     QString id;
     QString displayName;
-    unsigned long duration;
+    QString duration;
     QString url;
     bool isPlaying;
 };

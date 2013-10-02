@@ -8,8 +8,10 @@ class FocusTextEdit : public QTextEdit {
 public:
     explicit FocusTextEdit(QWidget* parent = 0);
     virtual void focusInEvent(QFocusEvent* event);
+    virtual void keyPressEvent(QKeyEvent* e);
 signals:
     void focusIn();
+    void returnPressed();
 };
 
 #endif // FOCUSTEXTEDIT_H
