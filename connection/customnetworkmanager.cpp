@@ -6,10 +6,10 @@
 
 
 
-CustomNetworkAccessManager::CustomNetworkAccessManager (QSsl::SslProtocol protocol, QSslSocket::PeerVerifyMode mode) {
+CustomNetworkAccessManager::CustomNetworkAccessManager (QSsl::SslProtocol protocol, QSslSocket::PeerVerifyMode mode, QObject* parent) : QNetworkAccessManager(parent) {
     this->protocol = protocol;
     this->mode = mode;
-    CookieJar *cookieJar = new CookieJar();
+    CookieJar *cookieJar = new CookieJar(this);
     this->setCookieJar(cookieJar);
 }
 

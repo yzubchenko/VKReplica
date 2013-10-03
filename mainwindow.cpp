@@ -29,7 +29,7 @@ MainWindow::MainWindow(const Application* application, QWidget* parent) : QMainW
     ui->statusButton->setEnabled(false);
     ui->toolFrame->setEnabled(false);
     ui->usernameLabel->setText("Требуется авторизация");
-    ContactDelegate* contactDelegate = new ContactDelegate();
+    ContactDelegate* contactDelegate = new ContactDelegate(this);
     ui->contactsListView->setItemDelegate(contactDelegate);
     connect(ui->contactsListView, SIGNAL(doubleClicked(QModelIndex)),this, SLOT(showDialog(QModelIndex)));
     connect(ui->authButton, SIGNAL(clicked()),&application->getAuth(), SLOT(changeAuthStatus()));
@@ -99,7 +99,7 @@ void MainWindow::applyOnlineStatus(QAction* action){
             disconnect(&application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)), this, SLOT(onMessage()));
             //application->getApiMethodExecutor()->executeMethod("account.setOffline", QMap<QString,QString>());
             ui->contactsListView->setEnabled(false);
-            ui->contactsListView->setModel(NULL);
+            ui->contactsListView->setModel(nullptr);
             contactModel->unload();
         }
 

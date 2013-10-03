@@ -39,6 +39,8 @@ bool descRating(const Contact* c1 , const Contact* c2 ) {
 
 ContactModel::ContactModel(const Application* application, QObject* parent) : QAbstractListModel(parent) {
     this->application = application;
+    contactList = QList<Contact*>();
+    contactStorage = QList<Contact*>();
     allVisible = true;
 }
 
@@ -51,8 +53,12 @@ void ContactModel::load() {
     QVariantList contactJsonList = result.toVariantMap().take("response").toMap().take("items").toList();
 
     //Заполнение списка контактов и списка порядка
-    contactList = QList<Contact*>();
-    contactStorage = QList<Contact*>();
+    contactList.clear();
+    if (!contactStorage.isEmpty()) {
+        qDeleteAll(contactStorage);
+        contactStorage.clear();
+
+    }
     int rating = contactJsonList.size();
     foreach (QVariant value,contactJsonList) {
         QMap<QString, QVariant> valueMap = value.toMap();
@@ -107,9 +113,14 @@ void ContactModel::reloadFromStorage() {
 }
 
 
-/*Запрос контактов по API*/
+/*Выгрузка контактов*/
 void ContactModel::unload() {
     contactList.clear();
+    if (!contactStorage.isEmpty()) {
+        qDeleteAll(contactStorage);
+        contactStorage.clear();
+
+    }
     disconnect(&application->getLongPollExecutor(),SIGNAL(contactIsOnline(QString,bool)),this, SLOT(setContactOnline(QString,bool)));
     disconnect(&application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
 }

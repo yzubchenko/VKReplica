@@ -80,7 +80,7 @@ void Application::onNetworkStatus(bool isOk) {
 }
 
 Application::~Application() {
-
+    auth->deleteLater();
 }
 
 ContactModel &Application::getContactModel() const {

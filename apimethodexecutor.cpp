@@ -10,7 +10,7 @@
 ApiMethodExecutor::ApiMethodExecutor(QString token, QObject* parent) : QObject(parent) {
     this->token = token;
     timeoutCounter = 0;
-    networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone);
+    networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone, this);
 }
 
 QJsonObject ApiMethodExecutor::executeMethod(const QString& methodName, const QMap<QString, QString>& params) const {

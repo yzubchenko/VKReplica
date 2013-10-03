@@ -12,7 +12,7 @@ private:
     QSsl::SslProtocol protocol;
     QSslSocket::PeerVerifyMode mode;
 public:
-    CustomNetworkAccessManager (QSsl::SslProtocol protocol, QSslSocket::PeerVerifyMode mode);
+    CustomNetworkAccessManager (QSsl::SslProtocol protocol, QSslSocket::PeerVerifyMode mode, QObject* parent);
 
 protected:
     QNetworkReply* createRequest(Operation op, const QNetworkRequest& req, QIODevice* outgoingData = 0);

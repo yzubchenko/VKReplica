@@ -34,9 +34,9 @@ void Auth::calculateWebViewGeometry() const {
     webView->setFixedSize(QSize(607,314));
 }
 
-void Auth::refreshWebView() const {
+void Auth::refreshWebView() {
     webView->setHtml("");
-    CustomNetworkAccessManager* networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone);
+    CustomNetworkAccessManager* networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone, this);
     networkAccessManager->connect(networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleReply(QNetworkReply*)));
     webView->page()->setNetworkAccessManager(networkAccessManager);
 }

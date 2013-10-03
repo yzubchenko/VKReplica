@@ -14,7 +14,7 @@ AudioPlayer::AudioPlayer(const Application* application, QWidget *parent) : QDia
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(onSearchButtonClicked()));
 
     ui->listView->setModel(audioModel);
-    ui->listView->setItemDelegate(new AudioDelegate());
+    ui->listView->setItemDelegate(new AudioDelegate(this));
     player = new QMediaPlayer(this,QMediaPlayer::StreamPlayback);
     player->setPlaylist(audioModel->getPlaylist());
     connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onRowDoubleClicked(QModelIndex)));

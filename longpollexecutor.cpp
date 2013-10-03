@@ -7,7 +7,7 @@
 
 LongPollExecutor::LongPollExecutor(const Application* application, QObject* parent) : QObject(parent) {
     this->application = application;
-    this->networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone);
+    this->networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone, this);
     this->networkAccessManager->connect(
                 networkAccessManager
                 , SIGNAL(finished(QNetworkReply*))

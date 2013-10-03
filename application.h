@@ -22,8 +22,8 @@ public:
     const QString& getUserDisplayName() const {return userDisplayName;}
     const QString& getUserId() const {return userId;}
     const Auth& getAuth() const { return *auth; }
-    const QIcon& getOfflineIcon() const {return *offlineIcon;}
-    const QIcon& getOnlineIcon() const {return *onlineIcon;}
+    const QIcon& getOfflineIcon() const {return offlineIcon;}
+    const QIcon& getOnlineIcon() const {return onlineIcon;}
 
 signals:
 
@@ -34,8 +34,8 @@ private:
     QString userDisplayName;
     QString userId;
     MainWindow* mainWindow;
-    const QIcon* offlineIcon = new QIcon(":/contacts/resources/offline.png");
-    const QIcon* onlineIcon = new QIcon(":/contacts/resources/online.png");
+    const QIcon offlineIcon = QIcon(":/contacts/resources/offline.png");
+    const QIcon onlineIcon = QIcon(":/contacts/resources/online.png");
     void applyUser();
 
     volatile unsigned int networkErrorCounter;

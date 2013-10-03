@@ -35,7 +35,7 @@ private:
     bool isLogin;
 
     QMap<QString, QString> parseReplyFragment(const QString authFragment) const;
-    void refreshWebView() const;
+    void refreshWebView();
     void calculateWebViewGeometry() const;
 };
 

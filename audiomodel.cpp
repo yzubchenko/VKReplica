@@ -29,8 +29,11 @@ QVariant AudioModel::data(const QModelIndex &index, int role) const {
 }
 
 void AudioModel::search(QString message) {
-    audioList.clear();
-    playlist->clear();
+    if (!audioList.isEmpty()) {
+        playlist->clear();
+        qDeleteAll(audioList);
+        audioList.clear();
+    }
     if (!message.isEmpty()) {
         QMap<QString,QString> params;
         params.insert("q",message);

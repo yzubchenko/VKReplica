@@ -6,7 +6,7 @@
 int main(int argc, char* argv[])
 {
     QApplication qApplication(argc, argv);
-    Application* application = new Application();
+    Application* application = new Application(nullptr);
 
     application->exec();
 
