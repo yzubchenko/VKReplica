@@ -15,7 +15,9 @@
 #include <connection/cookiejar.h>
 
 /*Конструктор*/
-Auth::Auth(QWidget* parent) : QWidget(parent) {
+Auth::Auth(QWidget* parent) :
+    QWidget(parent)
+{
     url = QUrl("https://oauth.vk.com/authorize?client_id=3860301&scope=friends,audio,status,messages&redirect_uri=https://oauth.vk.com/blank.html&display=page&v=5.0&response_type=token");
     webView = new QWebView(parent);
     webView->setWindowTitle("VK Replica - Авторизация");

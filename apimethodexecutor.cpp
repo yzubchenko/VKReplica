@@ -7,9 +7,11 @@
 #include <QEventLoop>
 #include <QJsonDocument>
 
-ApiMethodExecutor::ApiMethodExecutor(QString token, QObject* parent) : QObject(parent) {
-    this->token = token;
-    timeoutCounter = 0;
+ApiMethodExecutor::ApiMethodExecutor(QString token, QObject* parent) :
+    QObject(parent),
+    token(token),
+    timeoutCounter(0)
+{
     networkAccessManager = new CustomNetworkAccessManager(QSsl::TlsV1SslV3, QSslSocket::VerifyNone, this);
 }
 

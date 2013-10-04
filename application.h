@@ -1,6 +1,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include <QApplication>
 #include <QObject>
 #include "auth.h"
 #include "apimethodexecutor.h"
@@ -12,7 +13,7 @@ class MainWindow;
 class Application : public QObject {
     Q_OBJECT
 public:
-    explicit Application(QObject* parent = 0);
+    explicit Application(QApplication* qApplication, QObject* parent = 0);
     void exec();
     const ApiMethodExecutor& getApiMethodExecutor() const {return *apiMethodExecutor;}
     ~Application();
@@ -28,6 +29,7 @@ public:
 signals:
 
 private:
+    QApplication* qApplication;
     Auth* auth;
     ApiMethodExecutor* apiMethodExecutor;
     LongPollExecutor* longPollExecutor;

@@ -14,7 +14,7 @@ class DialogManager : public QDialog {
     Q_OBJECT
 
 public:
-    explicit DialogManager(const Application* application, QWidget* parent = 0);
+    DialogManager(const Application* application, QWidget* parent = 0);
     ~DialogManager();
     void showDialog(const Contact& contact);
 public slots:

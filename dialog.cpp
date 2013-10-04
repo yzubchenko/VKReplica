@@ -8,12 +8,14 @@
 #include <QTimer>
 #include <QShortcut>
 
-Dialog::Dialog(const Application* application, const QString& userId, QWidget* parent) : QWidget(parent), ui(new Ui::Dialog) {
-    this->application = application;
-    this->userId = userId;
+Dialog::Dialog(const Application* application, const QString& userId, QWidget* parent) :
+    QWidget(parent),
+    ui(new Ui::Dialog),
+    application(application),
+    userId(userId)
+{
     unreadInList = QStringList();
     setupUi();
-
     connect(ui->textEdit
             , SIGNAL(focusIn())
             , this

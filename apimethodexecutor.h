@@ -11,7 +11,7 @@ class ApiMethodExecutor : public QObject {
     Q_OBJECT
 
 public:
-    explicit ApiMethodExecutor(QString token, QObject* parent = 0);
+    ApiMethodExecutor(QString token, QObject* parent = 0);
     QJsonObject executeMethod(const QString& methodName, const QMap<QString,QString>& params) const;
     ~ApiMethodExecutor();
 signals:

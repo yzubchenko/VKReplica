@@ -19,9 +19,13 @@
 
 #include <QJsonObject>
 
-Application::Application(QObject *parent) : QObject(parent) {
-    networkErrorCounter = 0;
-    maxNetworkErrorCount = 50;
+Application::Application(QApplication* qApplication, QObject *parent) :
+    QObject(parent),
+    qApplication(qApplication),
+    networkErrorCounter(0),
+    maxNetworkErrorCount(50)
+{
+
 }
 
 
@@ -31,7 +35,9 @@ void Application::exec() {
     auth->showAuthDialog();
 
     mainWindow = new MainWindow(this);
+    connect(mainWindow, SIGNAL(exit()), qApplication, SLOT(closeAllWindows()));
     mainWindow->show();
+
 }
 
 void Application::applyUser() {

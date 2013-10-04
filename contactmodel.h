@@ -25,7 +25,7 @@ public:
         AscDisplayName
     };
 
-    explicit ContactModel(const Application* application, QObject *parent = 0);
+    ContactModel(const Application* application, QObject *parent = 0);
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role) const;

@@ -20,7 +20,7 @@ Q_DECLARE_METATYPE(Audio*)
 class AudioModel : public QAbstractListModel {
     Q_OBJECT
 public:
-    explicit AudioModel(const Application* application, QObject* parent = 0);
+    AudioModel(const Application* application, QObject* parent = 0);
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role) const;

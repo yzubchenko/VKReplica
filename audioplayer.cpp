@@ -5,8 +5,11 @@
 #include <QJsonObject>
 #include <QMediaPlaylist>
 
-AudioPlayer::AudioPlayer(const Application* application, QWidget *parent) : QDialog(parent), ui(new Ui::AudioPlayer) {
-    this->application = application;
+AudioPlayer::AudioPlayer(const Application* application, QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::AudioPlayer),
+    application(application)
+{
     this->audioModel = new AudioModel(application,this);
     connect(this, SIGNAL(searchRequest(QString)), audioModel, SLOT(search(QString)));
     ui->setupUi(this);

@@ -3,8 +3,12 @@
 #include "ui_dialogmanager.h"
 #include "longpollexecutor.h"
 
-DialogManager::DialogManager(const Application* application, QWidget* parent) : QDialog(parent), ui(new Ui::DialogManager) {
-    this->application = application;
+DialogManager::DialogManager(const Application* application, QWidget* parent) :
+    QDialog(parent),
+    application(application),
+    ui(new Ui::DialogManager)
+
+{
     dialogMap = QMap<QString,Dialog*>();
     ui->setupUi(this);
     Qt::WindowFlags flags = Qt::Window | Qt::WindowSystemMenuHint

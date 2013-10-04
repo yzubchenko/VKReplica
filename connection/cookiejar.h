@@ -57,8 +57,7 @@ QT_END_NAMESPACE
 
 class AutoSaver;
 
-class CookieJar : public QNetworkCookieJar
-{
+class CookieJar : public QNetworkCookieJar {
     friend class CookieModel;
     Q_OBJECT
     Q_PROPERTY(AcceptPolicy acceptPolicy READ acceptPolicy WRITE setAcceptPolicy)

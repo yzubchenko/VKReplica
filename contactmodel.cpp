@@ -37,11 +37,13 @@ bool descRating(const Contact* c1 , const Contact* c2 ) {
 
 }
 
-ContactModel::ContactModel(const Application* application, QObject* parent) : QAbstractListModel(parent) {
-    this->application = application;
+ContactModel::ContactModel(const Application* application, QObject* parent) :
+    QAbstractListModel(parent),
+    application(application),
+    allVisible(true)
+{
     contactList = QList<Contact*>();
     contactStorage = QList<Contact*>();
-    allVisible = true;
 }
 
 void ContactModel::load() {

@@ -19,19 +19,22 @@ class MainWindow;
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    explicit MainWindow(const Application* application, QWidget* parent = 0);
+    MainWindow(const Application* application, QWidget* parent = 0);
     ~MainWindow();
     void applyAuthStatus(const bool& isAuthComplete);
     ContactModel& getContactModel() const {return *contactModel;}
+    void closeEvent(QCloseEvent *event);
 public slots:
     void showDialog(const QModelIndex& modelIndex) const;
     void applyOnlineStatus(QAction* action);
     void applyOnlineStatus(bool isOnline);
     void onMessage() const;
     void switchContactsVisibility();
-    void showAudioPlayer();
+    void showAudioPlayer() const;
     void switchSound();
     void onPlayerStateChanged(QMediaPlayer::State state) const;
+signals:
+    void exit();
 private:
     bool isAuthComplete;
     Ui::MainWindow* ui;

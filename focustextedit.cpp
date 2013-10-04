@@ -3,7 +3,9 @@
 #include <QKeyEvent>
 #include <QTextEdit>
 
-FocusTextEdit::FocusTextEdit(QWidget* parent) : QTextEdit(parent){
+FocusTextEdit::FocusTextEdit(QWidget* parent) :
+    QTextEdit(parent)
+{
 
 }
 

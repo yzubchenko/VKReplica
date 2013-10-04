@@ -3,12 +3,10 @@
 
 
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     QApplication qApplication(argc, argv);
-    Application* application = new Application(nullptr);
+    Application* application = new Application(&qApplication, nullptr);
 
     application->exec();
-
     return qApplication.exec();
 }

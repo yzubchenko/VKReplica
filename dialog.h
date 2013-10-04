@@ -14,7 +14,7 @@ class Dialog : public QWidget {
     Q_OBJECT
 
 public:
-    explicit Dialog(const Application* application, const QString& userId, QWidget* parent = 0);
+    Dialog(const Application* application, const QString& userId, QWidget* parent = 0);
     const QString& getUserId() const {return userId;}
     void setUserOnline(const bool isOnline) const;
     ~Dialog();

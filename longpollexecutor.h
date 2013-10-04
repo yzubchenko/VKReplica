@@ -9,10 +9,11 @@ class Application;
 class LongPollExecutor : public QObject {
     Q_OBJECT
 public:
-    explicit LongPollExecutor(const Application *application, QObject *parent = 0);
+    LongPollExecutor(const Application *application, QObject *parent = 0);
     void start();
     void stop();
     const bool& isStarted() const {return started;}
+
 public slots:
     void replyFinished(QNetworkReply* reply);
 signals:
@@ -41,6 +42,7 @@ private:
     const uint F_FIXED = 256;
     const uint F_MEDIA = 512;
 
+    void acquireLongPollServer();
     void sendRequest() const;
     QList<int> parseFlags(int flags) const;
 };

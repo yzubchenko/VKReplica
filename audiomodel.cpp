@@ -1,11 +1,13 @@
 #include "audiomodel.h"
 #include <QMediaContent>
 
-AudioModel::AudioModel(const Application* application, QObject* parent) : QAbstractListModel(parent) {
-    this->application = application;
+AudioModel::AudioModel(const Application* application, QObject* parent) :
+    QAbstractListModel(parent),
+    application(application),
+    currentPlaying(-1)
+{
     this->audioList = QList<Audio*>();
     this->playlist = new QMediaPlaylist(this);
-    this->currentPlaying = -1;
 }
 
 int AudioModel::rowCount(const QModelIndex &parent) const {

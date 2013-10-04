@@ -16,13 +16,14 @@
 #include "longpollexecutor.h"
 #include "application.h"
 
-MainWindow::MainWindow(const Application* application, QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
-    this->application = application;
+MainWindow::MainWindow(const Application* application, QWidget* parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow),
+    application(application),
+    isOnline(false)
+{
     this->contactModel = new ContactModel(application,this);
     ui->setupUi(this);
-    isOnline = false;
-
-
 //    const QRect screenRect = QApplication::desktop()->rect();
 //    QRect *mainWindowRect = new QRect((screenRect.width()-260), (screenRect.height()-400), 260, 400);
 //    this->setGeometry(*mainWindowRect); /**Windows 2 screen bug**/
@@ -47,13 +48,14 @@ MainWindow::MainWindow(const Application* application, QWidget* parent) : QMainW
     player->setMedia(QUrl::fromLocalFile(tempMessageSoundPath));
     player->setVolume(100);
 
+
 }
 
 void MainWindow::applyAuthStatus(const bool& isAuthComplete) {
     this->isAuthComplete = isAuthComplete;
     if (isAuthComplete) {
-        dialogManager = new DialogManager(application,this);
-        audioPlayer = new AudioPlayer(application, this);
+        dialogManager = new DialogManager(application, nullptr);
+        audioPlayer = new AudioPlayer(application, nullptr);
         connect(ui->prevButton, SIGNAL(clicked()), audioPlayer, SLOT(onPrevious()));
         connect(ui->playButton, SIGNAL(clicked()), audioPlayer, SLOT(onPlay()));
         connect(ui->nextButton, SIGNAL(clicked()), audioPlayer, SLOT(onNext()));
@@ -75,7 +77,11 @@ void MainWindow::applyAuthStatus(const bool& isAuthComplete) {
     }
 }
 
-void MainWindow::applyOnlineStatus(QAction* action){
+void MainWindow::closeEvent(QCloseEvent *event) {
+    emit exit();
+}
+
+void MainWindow::applyOnlineStatus(QAction* action) {
     if (action == ui->onlineAction) {
         if (!isOnline){
             ui->statusButton->setIcon(application->getOnlineIcon());
@@ -123,7 +129,7 @@ void MainWindow::switchContactsVisibility() {
     contactModel->applyContactsVisibility(contactsAllVisible);
 }
 
-void MainWindow::showAudioPlayer() {
+void MainWindow::showAudioPlayer() const {
     audioPlayer->show();
 }
 

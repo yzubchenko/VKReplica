@@ -16,7 +16,7 @@ class AudioPlayer : public QDialog {
     Q_OBJECT
 
 public:
-    explicit AudioPlayer(const Application* application, QWidget *parent = 0);
+    AudioPlayer(const Application* application, QWidget *parent = 0);
     ~AudioPlayer();
     const QIcon playIcon = QIcon(":/audioplayer/resources/playControl.png");
     const QIcon pauseIcon = QIcon(":/audioplayer/resources/pauseControl.png");
