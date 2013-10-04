@@ -20,6 +20,7 @@
         <file>resources/sortName.png</file>
         <file>resources/sortRate.png</file>
         <file>resources/music.png</file>
+        <file>resources/favicon.png</file>
     </qresource>
     <qresource prefix="/audioplayer">
         <file>resources/search.png</file>

@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>VK Replica</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/main_window/resources/favicon.png</normaloff>:/main_window/resources/favicon.png</iconset>
+  </property>
   <property name="documentMode">
    <bool>false</bool>
   </property>

@@ -5,6 +5,7 @@
 #include "contactmodel.h"
 #include "dialogmanager.h"
 
+#include <QKeyEvent>
 #include <QMainWindow>
 #include <QMediaPlayer>
 #include <QStandardPaths>

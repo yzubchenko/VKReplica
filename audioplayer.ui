@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Аудиозаписи</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/main_window/resources/favicon.png</normaloff>:/main_window/resources/favicon.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>

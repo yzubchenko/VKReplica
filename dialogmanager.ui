@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>VK Replica - Диалоги</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/main_window/resources/favicon.png</normaloff>:/main_window/resources/favicon.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
     <number>2</number>
@@ -38,6 +42,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

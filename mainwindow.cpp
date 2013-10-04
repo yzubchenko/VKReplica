@@ -11,6 +11,7 @@
 #include <QVariantMap>
 #include <QFile>
 #include <QStackedLayout>
+#include <QKeyEvent>
 #include "contactdelegate.h"
 #include <QList>
 #include "longpollexecutor.h"
@@ -24,6 +25,9 @@ MainWindow::MainWindow(const Application* application, QWidget* parent) :
 {
     this->contactModel = new ContactModel(application,this);
     ui->setupUi(this);
+    setWindowIcon(this->application->getFavicon());
+
+    setWindowFlags( Qt::WindowTitleHint |  Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint | Qt::WindowSystemMenuHint);
 //    const QRect screenRect = QApplication::desktop()->rect();
 //    QRect *mainWindowRect = new QRect((screenRect.width()-260), (screenRect.height()-400), 260, 400);
 //    this->setGeometry(*mainWindowRect); /**Windows 2 screen bug**/
@@ -47,7 +51,6 @@ MainWindow::MainWindow(const Application* application, QWidget* parent) :
     }
     player->setMedia(QUrl::fromLocalFile(tempMessageSoundPath));
     player->setVolume(100);
-
 
 }
 
@@ -78,7 +81,8 @@ void MainWindow::applyAuthStatus(const bool& isAuthComplete) {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    emit exit();
+    event->ignore();
+    hide();
 }
 
 void MainWindow::applyOnlineStatus(QAction* action) {

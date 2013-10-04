@@ -11,6 +11,7 @@ DialogManager::DialogManager(const Application* application, QWidget* parent) :
 {
     dialogMap = QMap<QString,Dialog*>();
     ui->setupUi(this);
+    setWindowIcon(this->application->getFavicon());
     Qt::WindowFlags flags = Qt::Window | Qt::WindowSystemMenuHint
                                 | Qt::WindowMinimizeButtonHint
                                 | Qt::WindowMaximizeButtonHint

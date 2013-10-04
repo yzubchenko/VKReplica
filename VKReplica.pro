@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     audioplayer.cpp \
     audiomodel.cpp \
     audiodelegate.cpp \
-    draggableprogressbar.cpp
+    draggableprogressbar.cpp \
+    systemtrayicon.cpp
 
 HEADERS  += mainwindow.h \
     connection/customnetworkmanager.h \
@@ -50,7 +51,8 @@ HEADERS  += mainwindow.h \
     audioplayer.h \
     audiomodel.h \
     audiodelegate.h \
-    draggableprogressbar.h
+    draggableprogressbar.h \
+    systemtrayicon.h
 
 FORMS    += mainwindow.ui \
     dialogmanager.ui \

@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QStandardPaths>
+#include <QSystemTrayIcon>
 #include <QWidget>
 
 #include <QMap>
@@ -16,6 +17,7 @@
 #include "application.h"
 #include "dialog.h"
 #include "mainwindow.h"
+#include "systemtrayicon.h"
 
 #include <QJsonObject>
 
@@ -25,7 +27,11 @@ Application::Application(QApplication* qApplication, QObject *parent) :
     networkErrorCounter(0),
     maxNetworkErrorCount(50)
 {
-
+    favicon = QIcon(":/main_window/resources/favicon.png");
+//    icon.addFile(":/main_window/resources/fav32.png");
+//    icon.addFile(":/main_window/resources/fav64.png");
+//    icon.addFile(":/main_window/resources/fav128.png");
+    //TODO Добавить иконки больших размеров
 }
 
 
@@ -35,9 +41,10 @@ void Application::exec() {
     auth->showAuthDialog();
 
     mainWindow = new MainWindow(this);
-    connect(mainWindow, SIGNAL(exit()), qApplication, SLOT(closeAllWindows()));
     mainWindow->show();
 
+    systemTrayIcon = new SystemTrayIcon(this,this);
+    systemTrayIcon->show();
 }
 
 void Application::applyUser() {
@@ -91,5 +98,11 @@ Application::~Application() {
 
 ContactModel &Application::getContactModel() const {
     return mainWindow->getContactModel();
+}
+
+void Application::exit() {
+    qDebug() << "Application exit" ;
+    systemTrayIcon->hide();
+    qApplication->quit();
 }
 

@@ -16,6 +16,7 @@ Dialog::Dialog(const Application* application, const QString& userId, QWidget* p
 {
     unreadInList = QStringList();
     setupUi();
+
     connect(ui->textEdit
             , SIGNAL(focusIn())
             , this
@@ -43,6 +44,7 @@ Dialog::Dialog(const Application* application, const QString& userId, QWidget* p
 
 void Dialog::setupUi() {
     ui->setupUi(this);
+    setWindowIcon(this->application->getFavicon());
     QList<int> list = QList<int>();
     list << 200 << 100;
     ui->splitter->setSizes(list);
