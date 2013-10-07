@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QSet>
 #include <QAbstractListModel>
 
 class Application;
@@ -48,18 +49,18 @@ public slots:
     void acceptUnreadMessage(QString userId, bool hasUnread);
 
 signals:
-
+    void hasUnreadMessage(bool);
 private:
     const Application* application;
     QList<Contact*> contactList;
     QList<Contact*> contactStorage;
-
+    QSet<QString> unreadSet;
     SortOrder sortOrder = DescRating;
 
     bool allVisible;
     void sort();
     void insert(Contact* contact, int index = -1);
-    void checkUnreadMessages() const;
+    void checkUnreadMessages();
 
 };
 

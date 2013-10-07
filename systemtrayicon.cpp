@@ -1,13 +1,13 @@
 #include "systemtrayicon.h"
 #include "mainwindow.h"
 #include "application.h"
+#include "contactmodel.h"
 
 
 
 SystemTrayIcon::SystemTrayIcon(Application* application, QObject *parent) :
     QSystemTrayIcon(parent),
-    application(application)
-{
+    application(application) {
     setToolTip("VK Replica");
     setIcon(this->application->getFavicon());
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
@@ -28,6 +28,7 @@ void SystemTrayIcon::setupContextMenu() {
     contextMenu->addAction(exitAction);
 
     connect(contextMenu, SIGNAL(triggered(QAction*)), this, SLOT(onContextActionTriggered(QAction*)));
+    connect(&application->getContactModel(),SIGNAL(hasUnreadMessage(bool)),this, SLOT(acceptUnreadMessage(bool)));
     setContextMenu(contextMenu);
 }
 
@@ -42,6 +43,8 @@ void SystemTrayIcon::onActivated(QSystemTrayIcon::ActivationReason activationRea
         case DoubleClick: {
             if (application->getMainWindow().isHidden()) {
                 application->getMainWindow().show();
+                application->getMainWindow().activateWindow();
+                application->getMainWindow().raise();
             } else {
                 application->getMainWindow().hide();
             }
@@ -64,6 +67,10 @@ void SystemTrayIcon::onContextActionTriggered(QAction* action) {
         application->exit();
     }
 
+}
+
+void SystemTrayIcon::acceptUnreadMessage(bool isUnread) {
+    setIcon(isUnread ? messageIcon : this->application->getFavicon());
 }
 
 

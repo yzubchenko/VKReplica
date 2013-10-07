@@ -44,6 +44,7 @@ ContactModel::ContactModel(const Application* application, QObject* parent) :
 {
     contactList = QList<Contact*>();
     contactStorage = QList<Contact*>();
+    unreadSet = QSet<QString>();
 }
 
 void ContactModel::load() {
@@ -127,7 +128,7 @@ void ContactModel::unload() {
     disconnect(&application->getLongPollExecutor(),SIGNAL(messageRecieved(QString,bool)),this, SLOT(acceptUnreadMessage(QString,bool)));
 }
 
-void ContactModel::checkUnreadMessages() const {
+void ContactModel::checkUnreadMessages() {
     QMap<QString,QString> params;
     params.insert("filters","1");
     QJsonObject result = application->getApiMethodExecutor().executeMethod("messages.get",params);
@@ -139,6 +140,10 @@ void ContactModel::checkUnreadMessages() const {
         if (contact != nullptr) {
             contact->hasUnreadMessage = true;
         }
+        unreadSet.insert(userId);
+    }
+    if (!unreadSet.isEmpty()) {
+        emit hasUnreadMessage(true);
     }
 }
 
@@ -299,6 +304,19 @@ void ContactModel::acceptUnreadMessage(QString userId, bool hasUnread) {
     if (contact == nullptr) {
         return;
     }
+
+    if (hasUnread) {
+        if (unreadSet.isEmpty()) {
+            emit hasUnreadMessage(true);
+        }
+        unreadSet.insert(userId);
+    } else {
+        unreadSet.remove(userId);
+    }
+    if (unreadSet.isEmpty()) {
+        emit hasUnreadMessage(false);
+    }
+
     if (contact->hasUnreadMessage != hasUnread) {
         contact->hasUnreadMessage = hasUnread;
         refreshContact(contact);

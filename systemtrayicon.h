@@ -19,11 +19,12 @@ signals:
 public slots:
     void onActivated(QSystemTrayIcon::ActivationReason activationReason);
     void onContextActionTriggered(QAction* action);
+    void acceptUnreadMessage(bool isUnread);
 private:
     Application* application;
     QMenu* contextMenu;
     QAction* exitAction;
-
+    QIcon messageIcon = QIcon(":/contacts/resources/msg.png");
 
 };
 
