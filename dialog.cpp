@@ -7,6 +7,7 @@
 #include <QWebElement>
 #include <QTimer>
 #include <QShortcut>
+#include <QDesktopServices>
 
 Dialog::Dialog(const Application* application, const QString& userId, QWidget* parent) :
     QWidget(parent),
@@ -40,6 +41,8 @@ Dialog::Dialog(const Application* application, const QString& userId, QWidget* p
             , SLOT(markMessageIsRead(QString)));
     connect(ui->textEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
     connect(ui->pushButton, SIGNAL(released()), this, SLOT(sendMessage()));
+    ui->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    connect(ui->webView, SIGNAL(linkClicked(QUrl)), this, SLOT(openAttachment(QUrl)));
 }
 
 void Dialog::setupUi() {
@@ -70,10 +73,48 @@ void Dialog::loadHistory(const int count) {
             bool isRead = messageMap.value("read_state").toString().toInt() > 0;
 
             applyReadState(messageId, fromId, isRead);
-            historyHtml.append(prepareMessageHtml(messageId,fromId,timestamp,body,isRead));
+
+            QVariantList variantAttachments = messageMap.value("attachments").toList();
+            QList<QString> attachmentHtmls = prepareAttachmentHtmls(variantAttachments);
+
+            historyHtml.append(prepareMessageHtml(messageId,fromId,timestamp,body,isRead, attachmentHtmls));
         }
     }
     ui->webView->setHtml(historyHtml);
+}
+
+QList<QString> Dialog::prepareAttachmentHtmls(const QVariantList& variantAttachments) const {
+    QList<QString>* attachmentHtmls = new QList<QString>();
+    foreach(QVariant variantAttachment, variantAttachments) {
+        QVariantMap attachmentMap = variantAttachment.toMap();
+        QString type = attachmentMap.value("type").toString();
+        QVariantMap typedAttachmentMap = attachmentMap.value(type).toMap();
+        if (type == ATT_PHOTO) {
+            QString minPhotoUrl = "";
+            QString maxPhotoUrl = "";
+            int width = (int) typedAttachmentMap.value("width").toDouble();
+            if (width>1280) {
+                maxPhotoUrl = typedAttachmentMap.value("photo_2560").toString();
+            } else if (width<=1280 && width>807) {
+                maxPhotoUrl = typedAttachmentMap.value("photo_1280").toString();
+            } else if (width<=807 && width>604) {
+                maxPhotoUrl = typedAttachmentMap.value("photo_807").toString();
+            } else if (width<=604 && width>130) {
+                maxPhotoUrl = typedAttachmentMap.value("photo_604").toString();
+            } else if (width<=130 && width>75) {
+                maxPhotoUrl = typedAttachmentMap.value("photo_130").toString();
+            } else if (width<=75) {
+                maxPhotoUrl = typedAttachmentMap.value("photo_75").toString();
+                minPhotoUrl = typedAttachmentMap.value("photo_75").toString();
+            }
+            if (minPhotoUrl.isEmpty()) {
+                minPhotoUrl = typedAttachmentMap.value("photo_130").toString();
+            }
+            QString attachmentHtml = "<a href='" + maxPhotoUrl + "'><img src='" + minPhotoUrl + "' /></a>";
+            attachmentHtmls->push_back(attachmentHtml);
+        }
+    }
+    return *attachmentHtmls;
 }
 
 void Dialog::applyReadState(const QString& messageId, const QString& fromId, const bool& isRead) {
@@ -93,7 +134,7 @@ void Dialog::insertMessage(
         if (findMessageElement(messageId).isNull()) { //Для защиты от повторного добавления
             QString fromId = isOutbox ? application->getUserId() : userId;
             applyReadState(messageId, fromId, isRead);
-            QString messageHtml = prepareMessageHtml(messageId, fromId, timestamp, body, isRead);
+            QString messageHtml = prepareMessageHtml(messageId, fromId, timestamp, body, isRead, QList<QString>());
             ui->webView->setHtml(ui->webView->page()->mainFrame()->toHtml()+messageHtml);
         }
         if (ui->textEdit->isActiveWindow()) {
@@ -102,7 +143,7 @@ void Dialog::insertMessage(
     }
 }
 
-QString Dialog::prepareMessageHtml(const QString& messageId, const QString& fromId, const uint& timestamp, const QString& body, const bool& isRead) const {
+QString Dialog::prepareMessageHtml(const QString& messageId, const QString& fromId, const uint& timestamp, const QString& body, const bool& isRead, QList<QString> attachmentHtmls) const {
     QString displayName;
     if (fromId == application->getUserId()) {
         displayName = application->getUserDisplayName();
@@ -125,9 +166,18 @@ QString Dialog::prepareMessageHtml(const QString& messageId, const QString& from
             + displayName
             + "</span></div><div style='display:inline; float: right;'><span style='padding-right:5px; padding-top: 5px; color:#999;'>"
             + formattedDate
-            + "</span></div><br/><div style='padding:5px;'>"
-            + body
-            + "</div></div>";
+            + "</span></div><br/>";
+    if (!body.isEmpty()) {
+        messageHtml.append("<div style='padding:5px;'>" + body + "<br />");
+    }
+    if (!attachmentHtmls.isEmpty()) {
+        messageHtml.append("<div><span style='margin-bottom: 4px; color: #C0C0C0;'>Вложения<br /></span>");
+        foreach(QString attachmentHtml, attachmentHtmls) {
+            messageHtml.append(attachmentHtml+"&nbsp");
+        }
+        messageHtml.append("</div>");
+    }
+    messageHtml.append("</div></div>");
     return messageHtml;
 }
 
@@ -182,6 +232,10 @@ void Dialog::sendMessage() const {
         QJsonObject response = application->getApiMethodExecutor().executeMethod("messages.send",params);
         ui->textEdit->clear();
     }
+}
+
+void Dialog::openAttachment(QUrl url) {
+    QDesktopServices::openUrl(url);
 }
 
 void Dialog::setUserOnline(const bool isOnline) const{

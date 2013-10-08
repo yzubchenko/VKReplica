@@ -43,6 +43,7 @@ void SystemTrayIcon::onActivated(QSystemTrayIcon::ActivationReason activationRea
         case DoubleClick: {
             if (application->getMainWindow().isHidden()) {
                 application->getMainWindow().show();
+                application->getMainWindow().setWindowState(Qt::WindowActive);
                 application->getMainWindow().activateWindow();
                 application->getMainWindow().raise();
             } else {

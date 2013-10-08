@@ -20,6 +20,7 @@ public:
     ~Dialog();
 
 
+
 public slots:
     void insertMessage(
             const QString& messageId
@@ -31,6 +32,7 @@ public slots:
     void markInboxRead();
     void markMessageIsRead(const QString& messageId) const;
     void sendMessage() const;
+    void openAttachment(QUrl url);
 
 private:
     Ui::Dialog* ui;
@@ -40,10 +42,17 @@ private:
 
     void setupUi();
     void loadHistory(const int count);
-    QString prepareMessageHtml(const QString& messageId, const QString& fromId, const uint& timestamp, const QString& body, const bool& isRead) const;
+    QString prepareMessageHtml(const QString& messageId, const QString& fromId, const uint& timestamp, const QString& body, const bool& isRead, QList<QString> attachmentHtmls) const;
     QWebElement findMessageElement(const QString& messageId) const;
 
     void applyReadState(const QString& messageId, const QString& fromId, const bool& isRead);
+
+    const QString ATT_PHOTO = "photo";
+    const QString ATT_VIDEO = "video";
+    const QString ATT_DOC = "doc";
+    const QString ATT_WALL = "wall";
+    const QString ATT_WALL_REPLY = "wall_reply";
+    QList<QString> prepareAttachmentHtmls(const QVariantList& variantAttachments) const;
 private slots:
     void scrollToBottom(const QSize& s) const;
     void checkSendAvailable() const;

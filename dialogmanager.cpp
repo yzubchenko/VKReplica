@@ -36,8 +36,10 @@ void DialogManager::showDialog(const Contact& contact) {
     }
     Dialog* dialog = dialogMap.value(contact.userId);
     this->show();
+    this->setWindowState(Qt::WindowActive);
     this->activateWindow();
     this->raise();
+
     this->ui->tabWidget->setCurrentWidget(dialog);
 }
 

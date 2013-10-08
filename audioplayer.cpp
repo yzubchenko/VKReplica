@@ -13,6 +13,7 @@ AudioPlayer::AudioPlayer(const Application* application, QWidget *parent) :
     this->audioModel = new AudioModel(application,this);
     connect(this, SIGNAL(searchRequest(QString)), audioModel, SLOT(search(QString)));
     ui->setupUi(this);
+    setWindowFlags( Qt::WindowTitleHint |  Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint | Qt::WindowSystemMenuHint);
     setWindowIcon(this->application->getFavicon());
     connect(ui->searchButton, SIGNAL(clicked()), this, SLOT(onSearchButtonClicked()));
     connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(onSearchButtonClicked()));

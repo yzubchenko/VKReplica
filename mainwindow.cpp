@@ -135,6 +135,9 @@ void MainWindow::switchContactsVisibility() {
 
 void MainWindow::showAudioPlayer() const {
     audioPlayer->show();
+    audioPlayer->setWindowState(Qt::WindowActive);
+    audioPlayer->activateWindow();
+    audioPlayer->raise();
 }
 
 void MainWindow::switchSound() {
